@@ -1,5 +1,4 @@
 # ERAF Go SDK
-__IMPORTANT NOTICE: This is work in progress and currently in a non-functioning state!__
 
 This is an SDK to read, edit and create *Entity-related Authentication Format* files, *entity* meaning
 a person, a device, an app, an endpoint or whatever it is you want to authenticate.
@@ -20,7 +19,7 @@ This is just one example of the many possible use cases.
 
 ### Creating and Marshalling
 
-First, create a new ERAF ``container``  struct and fill it with data:
+First, create a new ERAF ``container``  struct and fill it with data. ``Set`` calls can be chained.
 
 ```golang
 cert, _ := ioutil.ReadFile("localhost.cert")
@@ -28,9 +27,13 @@ key, _ := ioutil.ReadFile("localhost.key")
 sig := sha256.Sum256(cert)
 
 container := eraf.New()
+container.
+	SetCertificate(cert).
+	SetPrivateKey(key).
+	SetSignature(sig[:])
 ```
 
-Now, you can either marshal (serialize) the just created *ERAF* file into an ``io.Writer`` 
+Now, you can either marshal (serialize) the created *ERAF* container into an ``io.Writer`` 
 or directly into a file:
 
 ```golang
@@ -38,8 +41,14 @@ or directly into a file:
 var b bytes.Buffer
 err := container.Marshal(&b) // as a reference
 
+// or directly into an http.ResponseWriter
+func handler(w http.ResponseWriter, r *http.Request) {
+	// some code here
+	err := container.Marshal(w)
+}
+
 // or into a file
-err := container.MarshalToFile("somefile.eraf") // the ending does not matter, actually
+err := container.MarshalToFile("somefile.eraf") // the file extension does not matter, actually
 ```
 
 ### Reading and Unmarshalling
@@ -54,14 +63,15 @@ var container eraf.Container
 err := eraf.Unmarshal(resp.Body, &container)
 
 // or directly from a file
-err := eraf.UnmarshalFromFile("somefile.eraf", &container) // Again, the ending doesn't matter
+var container eraf.Container
+err := eraf.UnmarshalFromFile("somefile.eraf", &container) // Again, the extension doesn't matter
 ```
 
-The *ERAF* Container implements the ``io.Reader`` interface, so you can easily supply it as a 
-body parameter for HTTP requests:
+The *ERAF* Container implements the ``io.Reader`` interface, so you can supply it as the 
+body parameter for HTTP requests which will read the whole container into the request body:
 
 ```golang
-req, _ := http.NewRequest(http.MethodPost, "https://some-url.com", container)
+req, _ := http.NewRequest(http.MethodPost, "https://some-url.com/", container)
 ```
 
 ### Obtaining Information

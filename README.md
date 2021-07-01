@@ -6,13 +6,17 @@ a person, a device, an app, an endpoint or whatever it is you want to authentica
 This is a prototype implementation, using BigEndian, currently only tested on windows/amd64.
 Tests on other OS/Arch combinations are due.
 
+There is of course some slight overhead. The data fields, like ``Certificate`` or ``Nonce`` can all
+be empty, but there is always space reserved for headers, even if no data has been set yet.
+This overhead currently amounts to __42 bytes__.
+
 ## Purpose
 
 There are a lot of different ways to authenticate an entity. Using username and password, a bearer
 token or a certificate are just a few examples. This format is for bundling different 
 authentication information into a single, portable file, easily transmittable over the line, e.g. 
-via HTTP. You can for example use the ``Nonce`` and ``Tag`` fields to save meta data for AES
-encryption of data (e.g. the certificate) and decrypt the content at the recipients device.
+via HTTP or email. You can for example use the ``Nonce`` and ``Tag`` fields to save meta data for AES
+encryption of the data (e.g. the certificate) and decrypt the content at the recipient's device.
 This is just one example of the many possible use cases.
 
 ## Examples
@@ -82,7 +86,7 @@ Get some byte amount information:
 // Total length
 totalLen := container.Len()
 
-// header length (currently constant 27 bytes)
+// header length (currently constant 42 bytes)
 headerLen := container.HeaderLen()
 
 // payload length

@@ -190,8 +190,8 @@ func (c *Container) SetSignature(sig []byte) *Container {
 	return c
 }
 
-// Version returns the combination of all version elements as a semantic version string
-func (c *Container) Version() string {
+// GetVersion returns the combination of all version elements as a semantic version string
+func (c *Container) GetVersion() string {
 	return fmt.Sprintf("%d.%d.%d", c.versionMajor, c.versionMinor, c.versionPatch)
 }
 

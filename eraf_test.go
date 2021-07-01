@@ -189,3 +189,20 @@ func TestContainer_PayloadLen(t *testing.T) {
 		})
 	}
 }
+
+func TestContainer_HeaderLen(t *testing.T) {
+	tests := []struct {
+		name   string
+		container *Container
+		want   int
+	}{
+		{name: "normal", container: New(), want: int(headerSize)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.container.HeaderLen(); got != tt.want {
+				t.Errorf("HeaderLen() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

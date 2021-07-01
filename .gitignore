@@ -1,0 +1,5 @@
+.vscode/
+.idea/
+testdata/
+
+__temp.eraf

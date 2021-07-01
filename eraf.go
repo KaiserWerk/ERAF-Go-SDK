@@ -211,15 +211,15 @@ func (c *Container) PayloadLen() int {
 		len(c.privateKey) + len(c.email) + len(c.username) + len(c.token) + len(c.signature)
 }
 
+func (c *Container) Read(s []byte) (int, error) {
+	s = c.Bytes()
+	return c.Len(), nil
+}
+
 // Bytes returns the complete ERAF file as a []byte
 func (c *Container) Bytes() []byte {
 	h := c.Headers()
 	return append(h[:], c.Payload()...)
-}
-
-func (c *Container) Read(s []byte) (int, error) {
-	s = c.Bytes()
-	return c.Len(), nil
 }
 
 // Headers returns just the header array of the ERAF file

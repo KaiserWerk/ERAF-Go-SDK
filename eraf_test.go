@@ -90,16 +90,12 @@ func TestContainer_Payload(t *testing.T) {
 	}{
 		{name: "empty", container: New(), want: []byte{0, 0, 0}},
 		{name: "empty with version", container: func() *Container {
-			c := New()
-			c.SetVersionMajor(14)
-			c.SetVersionMinor(4)
-			c.SetVersionPatch(144)
-			return c
+			return New().SetVersionMajor(14).
+				SetVersionMinor(4).
+				SetVersionPatch(144)
 		}(), want: []byte{14, 4, 144}},
 		{name: "with username", container: func() *Container {
-			c := New()
-			c.SetUsername([]byte("my-cool-username"))
-			return c
+			return New().SetUsername([]byte("my-cool-username"))
 		}(), want: append([]byte{0, 0, 0}, []byte("my-cool-username")...)},
 	}
 	for _, tt := range tests {
@@ -126,16 +122,12 @@ func TestContainer_Bytes(t *testing.T) {
 	}{
 		{name: "empty", container: New(), wantedLength: 45},
 		{name: "empty with version", container: func() *Container {
-			c := New()
-			c.SetVersionMajor(14)
-			c.SetVersionMinor(4)
-			c.SetVersionPatch(144)
-			return c
+			return New().SetVersionMajor(14).
+				SetVersionMinor(4).
+				SetVersionPatch(144)
 		}(), wantedLength: 45},
 		{name: "with token", container: func() *Container {
-			c := New()
-			c.SetToken([]byte("123abc456def"))
-			return c
+			return New().SetToken([]byte("123abc456def"))
 		}(), wantedLength: 57},
 	}
 	for _, tt := range tests {
@@ -160,9 +152,7 @@ func TestContainer_Read(t *testing.T) {
 	}{
 		{name: "empty", container: New(), args: args{s: []byte{}}, want: 45, wantErr: false},
 		{name: "with email", container: func() *Container {
-			c := New()
-			c.SetEmail([]byte("my@cool-domain.com"))
-			return c
+			return New().SetEmail([]byte("my@cool-domain.com"))
 		}(), args: args{s:[]byte{}}, want: 63, wantErr: false},
 	}
 	for _, tt := range tests {
@@ -188,9 +178,7 @@ func TestContainer_PayloadLen(t *testing.T) {
 	}{
 		{name: "empty", container: New(), want: 3},
 		{name: "with personal identifier", container: func() *Container {
-			c := New()
-			c.SetPersonalIdentifier([]byte{1, 3, 5, 7, 9})
-			return c
+			return New().SetPersonalIdentifier([]byte{1, 3, 5, 7, 9})
 		}(), want: 8},
 	}
 	for _, tt := range tests {

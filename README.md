@@ -37,11 +37,11 @@ Now, you can either marshal (serialize) the created *ERAF* container into an ``i
 or directly into a file:
 
 ```golang
-// to an io.Writer
+// into a buffer
 var b bytes.Buffer
 err := container.Marshal(&b) // as a reference
 
-// or directly into an http.ResponseWriter
+// or into an http.ResponseWriter
 func handler(w http.ResponseWriter, r *http.Request) {
 	// some code here
 	err := container.Marshal(w)
@@ -53,7 +53,7 @@ err := container.MarshalToFile("somefile.eraf") // the file extension does not m
 
 ### Reading and Unmarshalling
 
-You can either read a ``ERAF`` from an ``io.Reader`` or directly from a file:
+You can either read an ``ERAF`` container from an ``io.Reader`` or directly from a file:
 
 ```golang
 // from an io.Reader
@@ -71,7 +71,7 @@ The *ERAF* Container implements the ``io.Reader`` interface, so you can supply i
 body parameter for HTTP requests which will read the whole container into the request body:
 
 ```golang
-req, _ := http.NewRequest(http.MethodPost, "https://some-url.com/", container)
+req, err := http.NewRequest(http.MethodPost, "https://some-url.com/", container)
 ```
 
 ### Obtaining Information
@@ -95,6 +95,17 @@ Get the version as a proper Semantic Version string:
 
 ```golang
 versionStr := container.Version() // e.g. 2.14.8, the build version is ignored
+```
+
+For every ``Set`` method there is an equal ``Get`` method you can use to read the field from
+the container, e.g.
+
+```golang
+n := container.GetNonce()
+// or
+u := container.GetUsername()
+// etc
+// ...
 ```
 
 You can get just the headers and just the payload for custom parsing as you need:

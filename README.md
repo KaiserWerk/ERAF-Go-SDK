@@ -23,7 +23,8 @@ This is just one example of the many possible use cases.
 
 ### Creating and Marshalling
 
-First, create a new ERAF ``container``  struct and fill it with data. ``Set`` calls can be chained.
+First, create a new ``*eraf.Container`` with the ``eraf.New()`` function (this is required so that 
+headers are set up correctly) and fill it with data. ``Set`` calls can be chained.
 
 ```golang
 cert, _ := ioutil.ReadFile("localhost.cert")
@@ -57,7 +58,7 @@ err := container.MarshalToFile("somefile.eraf") // the file extension does not m
 
 ### Reading and Unmarshalling
 
-You can either read an ``ERAF`` container from an ``io.Reader`` or directly from a file:
+You can either read an *ERAF* container from an ``io.Reader`` or directly from a file:
 
 ```golang
 // from an io.Reader
@@ -71,7 +72,7 @@ var container eraf.Container
 err := eraf.UnmarshalFromFile("somefile.eraf", &container) // Again, the extension doesn't matter
 ```
 
-The *ERAF* Container implements the ``io.Reader`` interface, so you can supply it as the 
+The *ERAF* container implements the ``io.Reader`` interface, so you can supply it as the 
 body parameter for HTTP requests which will read the whole container into the request body:
 
 ```golang

@@ -17,13 +17,13 @@ func BenchmarkUnmarshal(b *testing.B) {
 
 	err = start.Marshal(&buf)
 	if err != nil {
-		b.Fatal(err.Error())
+		b.Fatal("could not marshal", err.Error())
 	}
 
 	for i := 0; i < b.N; i++ {
 		err = Unmarshal(&buf, container)
 		if err != nil {
-			b.Error(err.Error())
+			b.Fatal(err.Error())
 		}
 	}
 }

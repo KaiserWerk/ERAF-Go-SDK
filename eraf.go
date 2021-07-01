@@ -375,9 +375,16 @@ func Unmarshal(r io.Reader, target *Container) error {
 	}
 
 	if len(allBytes) == 0 {
-		return fmt.Errorf("file has 0 bytes")
+		return fmt.Errorf("reader gave 0 bytes")
 	}
 
+	return UnmarshalBytes(allBytes, target)
+}
+
+func UnmarshalBytes(allBytes []byte, target *Container) error {
+	if len(allBytes) < int(headerSize) {
+		return fmt.Errorf("buffer is not large enough")
+	}
 	headers := allBytes[:headerSize]
 	copy(target.headers[:], headers)
 	payload := allBytes[headerSize:]

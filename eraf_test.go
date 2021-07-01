@@ -1,27 +1,44 @@
 package era
 
 import (
-	"bytes"
 	"io"
 	"os"
 	"testing"
 )
 
-func BenchmarkUnmarshal(b *testing.B) {
+func BenchmarkUnmarshalFromFile(b *testing.B) {
+	const filename = "__bench_unmarshal_from_file.eraf"
 	var (
 		start = New()
-		buf bytes.Buffer
 		err error
 		container = New()
 	)
 
-	err = start.Marshal(&buf)
+	err = start.MarshalToFile(filename)
 	if err != nil {
 		b.Fatal("could not marshal", err.Error())
 	}
+	defer os.Remove(filename)
 
 	for i := 0; i < b.N; i++ {
-		err = Unmarshal(&buf, container)
+		err = UnmarshalFromFile(filename, container)
+		if err != nil {
+			b.Fatal(err.Error())
+		}
+	}
+}
+
+func BenchmarkUnmarshalBytes(b *testing.B) {
+	var (
+		start = New()
+		container = New()
+		err error
+	)
+	//fmt.Println("bytes:", start.Bytes())
+	//buf := bytes.NewBuffer(start.Bytes())
+
+	for i := 0; i < b.N; i++ {
+		err = UnmarshalBytes(start.Bytes(), container)
 		if err != nil {
 			b.Fatal(err.Error())
 		}
@@ -42,17 +59,18 @@ func BenchmarkMarshal(b *testing.B) {
 }
 
 func BenchmarkMarshalToFile(b *testing.B) {
+	const filename = "__bench_marshal_to_file.eraf"
 	var (
 		container = New()
 		err error
 	)
-	fh, err := os.Create("__test.eraf")
+	fh, err := os.Create(filename)
 	if err != nil {
 		b.Fatal(err.Error())
 	}
 
 	defer func() {
-		_ = os.Remove("__test.eraf")
+		_ = os.Remove(filename)
 	}()
 	defer fh.Close()
 

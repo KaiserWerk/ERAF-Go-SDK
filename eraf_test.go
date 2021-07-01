@@ -34,8 +34,6 @@ func BenchmarkUnmarshalBytes(b *testing.B) {
 		container = New()
 		err error
 	)
-	//fmt.Println("bytes:", start.Bytes())
-	//buf := bytes.NewBuffer(start.Bytes())
 
 	for i := 0; i < b.N; i++ {
 		err = UnmarshalBytes(start.Bytes(), container)

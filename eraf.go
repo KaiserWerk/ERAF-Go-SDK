@@ -254,19 +254,16 @@ func (c *Container) MarshalToFile(file string) error {
 
 // Marshal serializes the ERAF file into the given io.Writer
 func (c *Container) Marshal(w io.Writer) error {
-	header := []byte{
-		0, 3, // version (3 bytes)
-		0, 0, 0, 0, // nonce
-		0, 0, 0, 0, // tag
-		0, 0, 0, 0, // serial number
-		0, 0, 0, 0, // personal identifier
-		0, 0, 0, 0, // certificate
-		0, 0, 0, 0, // private key
-		0, 0, 0, 0, // email
-		0, 0, 0, 0, // username
-		0, 0, 0, 0, // token
-		0, 0, 0, 0, // signature
-	}
+
+	total := c.MarshalBytes()
+
+	_, err := w.Write(total)
+
+	return err
+}
+
+func (c *Container) MarshalBytes() []byte {
+	header := headerBlock[:]
 
 	var (
 		versionLength     = uint16(3)
@@ -350,10 +347,7 @@ func (c *Container) Marshal(w io.Writer) error {
 	payload = append(payload, c.signature...)
 
 	total := append(header, payload...)
-
-	_, err := w.Write(total)
-
-	return err
+	return total
 }
 
 // UnmarshalFromFile deserializes a ERAF from the given file

@@ -29,6 +29,7 @@ sig := sha256.Sum256(cert)
 
 container := eraf.New(true)
 
+// TODO: rework
 container := eraf.Container{
     // you can leave non-required version fields at their default
     VersionMajor: 1,
@@ -52,7 +53,7 @@ var b bytes.Buffer
 err := container.Marshal(&b) // as a reference
 
 // or into a file
-err := container.MarshalToFile("somefile.era") // the ending does not matter, actually
+err := container.MarshalToFile("somefile.eraf") // the ending does not matter, actually
 ```
 
 ### Reading and Unmarshalling
@@ -63,18 +64,18 @@ You can either read a ``ERAF`` from an ``io.Reader`` or directly from a file:
 // from an io.Reader
 resp, _ := http.Do(req)
 defer resp.Body.Close()
-var container era.Container
-err := era.Unmarshal(resp.Body, &ERAF)
+var container eraf.Container
+err := eraf.Unmarshal(resp.Body, &container)
 
 // or directly from a file
-err := era.UnmarshalFromFile("somefile.era", &container) // Again, the ending doesn't matter
+err := eraf.UnmarshalFromFile("somefile.eraf", &container) // Again, the ending doesn't matter
 ```
 
-The *ERAF* Container implements the ``io.Reader interface``, so you can easily supply it as a 
+The *ERAF* Container implements the ``io.Reader`` interface, so you can easily supply it as a 
 body parameter for HTTP requests:
 
 ```golang
-req, _ := http.NewRequest(http.MethodPost, "https://some-url", container)
+req, _ := http.NewRequest(http.MethodPost, "https://some-url.com", container)
 ```
 
 ### Obtaining Information

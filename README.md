@@ -27,21 +27,7 @@ cert, _ := ioutil.ReadFile("localhost.cert")
 key, _ := ioutil.ReadFile("localhost.key")
 sig := sha256.Sum256(cert)
 
-container := eraf.New(true)
-
-// TODO: rework
-container := eraf.Container{
-    // you can leave non-required version fields at their default
-    VersionMajor: 1,
-    VersionMinor: 0,
-    VersionPatch: 12,
-    VersionBuild: 0,
-    Nonce:        []byte{1, 5, 14, 78, 251, 147, 95, 45, 14, 10, 64, 52},
-    Tag:          []byte{95, 45, 14, 10, 64, 52, 1, 5, 14, 78, 251, 147, 163, 32, 57, 199},
-    Certificate:  cert,
-    PrivateKey:   key,
-    Signature:    sig[:],
-}
+container := eraf.New()
 ```
 
 Now, you can either marshal (serialize) the just created *ERAF* file into an ``io.Writer`` 

@@ -198,7 +198,7 @@ func (c *Container) GetVersion() string {
 	return fmt.Sprintf("%d.%d.%d", c.versionMajor, c.versionMinor, c.versionPatch)
 }
 
-// Len return the total amount of bytes of the file
+// Len returns the total amount of bytes of the file
 func (c *Container) Len() int {
 	return c.HeaderLen() + c.PayloadLen()
 }

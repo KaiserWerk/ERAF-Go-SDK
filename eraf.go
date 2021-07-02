@@ -1,6 +1,9 @@
 package era
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -212,14 +215,8 @@ func (c *Container) PayloadLen() int {
 }
 
 func (c *Container) Read(s []byte) (int, error) {
-	s = c.Bytes()
+	s = c.MarshalBytes()
 	return c.Len(), nil
-}
-
-// Bytes returns the complete ERAF file as a []byte
-func (c *Container) Bytes() []byte {
-	h := c.Headers()
-	return append(h[:], c.Payload()...)
 }
 
 // Headers returns just the header array of the ERAF file
@@ -452,4 +449,221 @@ func UnmarshalBytes(allBytes []byte, target *Container) error {
 	target.signature = signatureBytes
 
 	return nil
+}
+
+// EncryptEverything take a key to encrypt every data block using AES-256 in place. The nonce field is used to store
+// meta data; if already set, it will be overwritten. All block will be encrypted and written back, no data is
+// returned. Requires a key with a length of 16 bytes (AES-128), 24 bytes (AES-192) or 32 bytes (AES-256).
+func (c *Container) EncryptEverything(key []byte) error {
+	var (
+		b []byte
+		err error
+	)
+
+	// create and set nonce for further use
+	nonce := make([]byte, 12)
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return err
+	}
+	c.nonce = nonce
+
+	if b, err = c.EncryptSerialNumber(key); err != nil {
+		return err
+	}
+	c.serialNumber = b
+
+	if b, err = c.EncryptPersonalIdentifier(key); err != nil {
+		return err
+	}
+	c.personalIdentifier = b
+
+	if b, err = c.EncryptCertificate(key); err != nil {
+		return err
+	}
+	c.certificate = b
+
+	if b, err = c.EncryptPrivateKey(key); err != nil {
+		return err
+	}
+	c.privateKey = b
+
+	if b, err = c.EncryptEmail(key); err != nil {
+		return err
+	}
+	c.email = b
+
+	if b, err = c.EncryptUsername(key); err != nil {
+		return err
+	}
+	c.username = b
+
+	if b, err = c.EncryptToken(key); err != nil {
+		return err
+	}
+	c.token = b
+
+	if b, err = c.EncryptSignature(key); err != nil {
+		return err
+	}
+	c.signature = b
+
+	return nil
+}
+
+func (c *Container) EncryptSerialNumber(key []byte) ([]byte, error) {
+	return encryptAes(key, c.serialNumber, c.nonce)
+}
+
+func (c *Container) EncryptPersonalIdentifier(key []byte) ([]byte, error) {
+	return encryptAes(key, c.personalIdentifier, c.nonce)
+}
+
+func (c *Container) EncryptCertificate(key []byte) ([]byte, error) {
+	return encryptAes(key, c.certificate, c.nonce)
+}
+
+func (c *Container) EncryptPrivateKey(key []byte) ([]byte, error) {
+	return encryptAes(key, c.privateKey, c.nonce)
+}
+
+func (c *Container) EncryptEmail(key []byte) ([]byte, error) {
+	return encryptAes(key, c.email, c.nonce)
+}
+
+func (c *Container) EncryptUsername(key []byte) ([]byte, error) {
+	return encryptAes(key, c.username, c.nonce)
+}
+
+func (c *Container) EncryptToken(key []byte) ([]byte, error) {
+	return encryptAes(key, c.token, c.nonce)
+}
+
+func (c *Container) EncryptSignature(key []byte) ([]byte, error) {
+	return encryptAes(key, c.signature, c.nonce)
+}
+
+// DecryptEverything is the obvious counterpart to EncryptEverything. It performs the decryption in place, using,
+// depending on key length, either AES-128, AES-192 or AES-256.
+func (c *Container) DecryptEverything(key []byte) error {
+	var (
+		b []byte
+		err error
+	)
+	if b, err = c.DecryptSerialNumber(key); err != nil {
+		return err
+	}
+	c.serialNumber = b
+
+	if b, err = c.DecryptPersonalIdentifier(key); err != nil {
+		return err
+	}
+	c.personalIdentifier = b
+
+	if b, err = c.DecryptCertificate(key); err != nil {
+		return err
+	}
+	c.certificate = b
+
+	if b, err = c.DecryptPrivateKey(key); err != nil {
+		return err
+	}
+	c.privateKey = b
+
+	if b, err = c.DecryptEmail(key); err != nil {
+		return err
+	}
+	c.email = b
+
+	if b, err = c.DecryptUsername(key); err != nil {
+		return err
+	}
+	c.username = b
+
+	if b, err = c.DecryptToken(key); err != nil {
+		return err
+	}
+	c.token = b
+
+	if b, err = c.DecryptSignature(key); err != nil {
+		return err
+	}
+	c.signature = b
+
+	return nil
+}
+
+func (c *Container) DecryptSerialNumber(key []byte) ([]byte, error) {
+	return decryptAes(key, c.serialNumber, c.nonce)
+}
+
+func (c *Container) DecryptPersonalIdentifier(key []byte) ([]byte, error) {
+	return decryptAes(key, c.personalIdentifier, c.nonce)
+}
+
+func (c *Container) DecryptCertificate(key []byte) ([]byte, error) {
+	return decryptAes(key, c.certificate, c.nonce)
+}
+
+func (c *Container) DecryptPrivateKey(key []byte) ([]byte, error) {
+	return decryptAes(key, c.privateKey, c.nonce)
+}
+
+func (c *Container) DecryptEmail(key []byte) ([]byte, error) {
+	return decryptAes(key, c.email, c.nonce)
+}
+
+func (c *Container) DecryptUsername(key []byte) ([]byte, error) {
+	return decryptAes(key, c.username, c.nonce)
+}
+
+func (c *Container) DecryptToken(key []byte) ([]byte, error) {
+	return decryptAes(key, c.token, c.nonce)
+}
+
+func (c *Container) DecryptSignature(key []byte) ([]byte, error) {
+	return decryptAes(key, c.signature, c.nonce)
+}
+
+func encryptAes(key, s, nonce []byte) ([]byte, error) {
+	if len(key) != 32 && len(key) != 24 && len(key) != 16 {
+		return nil, fmt.Errorf("expected key length 32, 24 or 16, got %d", len(key))
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	aesGcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("unencrypted:", s)
+	b := aesGcm.Seal(nil, nonce, s, nil)
+	fmt.Println("encrypted:", b)
+
+	return b, nil
+}
+
+func decryptAes(key, s, nonce []byte) ([]byte, error) {
+	if len(key) != 32 && len(key) != 24 && len(key) != 16 {
+		return nil, fmt.Errorf("expected key length 32, 24 or 16, got %d", len(key))
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	aesGcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := aesGcm.Open(nil, nonce, s, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
 }

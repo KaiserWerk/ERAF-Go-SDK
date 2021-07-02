@@ -137,6 +137,27 @@ headers := container.Headers()
 payload := container.Payload()
 ```
 
+## Encryption & Decryption
+
+### Encryption
+
+For every field, there is a method to encrypt it, e.g. for field ``email`` there is a method
+``b, err := container.EncryptEmail(key)`` which returns the email encrypted with AES using 
+the given key.
+A nonce is required and must be set beforehand using the ``SetNonce(n)`` method, otherwise an 
+error will be returned. This method does **not** alter the container.
+
+If you want to encrypt all fields, use ``err := container.EncryptEverything(key)``. This method
+**does** alter the container. A new nonce will be generated and set automatically.
+This method replaces all field values with their respective encrypted values.
+
+### Decryption
+
+The decryption processes are the exact inverse of the encryption processes. E.g. use
+``b, err := container.DecryptEmail(key)`` to just decrypt the email.
+
+Otherwise, use ``err := container.DecryptEverything(key)`` to simply decrypt every field.
+
 ## Tests
 
 ### Unit tests

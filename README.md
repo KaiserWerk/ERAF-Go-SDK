@@ -145,7 +145,7 @@ For every field, there is a method to encrypt it, e.g. for field ``email`` there
 ``b, err := container.EncryptEmail(key)`` which returns the email encrypted with AES using 
 the given key.
 A nonce is required and must be set beforehand using the ``SetNonce(n)`` method, otherwise an 
-error will be returned. The nonce can be reused for subsequent call.
+error will be returned. The nonce can be reused for subsequent calls.
 This method does **not** alter the container.
 
 If you want to encrypt all fields, use ``err := container.EncryptEverything(key)``. This method

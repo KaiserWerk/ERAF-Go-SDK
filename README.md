@@ -3,12 +3,18 @@
 This is an SDK to read, edit and create *Entity-related Authentication Format* files, *entity* meaning
 a person, a device, an app, an endpoint or whatever it is you want to authenticate.
 
-This is a prototype implementation, using BigEndian, currently only tested on windows/amd64.
-Tests on other OS/Arch combinations are due.
-
 There is of course some slight overhead. The data fields, like ``Certificate`` or ``Nonce`` can all
 be empty, but there is always space reserved for headers, even if no data has been set yet.
-This overhead currently amounts to __42 bytes__.
+This overhead currently amounts to __42 bytes__, plus 3 bytes for the version. If this is acceptable
+for your use case, please give it a try out and give feedback whether it works out for you.
+
+## Due tests
+
+This is a prototype implementation, using BigEndian, currently only tested on windows/amd64.
+
+* Tests on other OS/Arch combinations
+* Stress tests to check overall performance
+* Integration tests
 
 ## Purpose
 
@@ -54,6 +60,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 // or into a file
 err := container.MarshalToFile("somefile.eraf") // the file extension does not matter, actually
+
+
+// or just get a []byte
+var s []byte = container.MarshalBytes()
 ```
 
 ### Reading and Unmarshalling
@@ -70,6 +80,10 @@ err := eraf.Unmarshal(resp.Body, &container)
 // or directly from a file
 var container eraf.Container
 err := eraf.UnmarshalFromFile("somefile.eraf", &container) // Again, the extension doesn't matter
+
+// or from a []byte
+var container *eraf.Container
+err := eraf.UnmarshalBytes(somebytes, container)
 ```
 
 The *ERAF* container implements the ``io.Reader`` interface, so you can supply it as the 
@@ -123,30 +137,26 @@ headers := container.Headers()
 payload := container.Payload()
 ```
 
-Or, lastly, just get the complete ``ERAF`` as a byte slice:
-
-```golang
-allBytes := container.Bytes()
-```
-
 ## Tests
 
 ### Unit tests
 
-Use ``go test ./...`` to run all unit tests.
+Use ``go test ./...`` to run all unit tests. Not everything is covered yet. 
+But everything should pass. :)
 
 ### Benchmark Tests
 
-Use ``go test -bench=.`` to run all benchmark tests.
-
-Here is a comparison for the ``Marshal()`` (to a byte buffer) and ``MarshalToFile()`` functions:
+Use ``go test -bench=.`` to run all benchmark tests. Not everything is covered yet.
 
 ```
 goos: windows
 goarch: amd64
-pkg: github.com/KaiserWerk/ERAFFile-Go-SDK
+pkg: github.com/KaiserWerk/ERAF-Go-SDK
 cpu: AMD FX(tm)-8320 Eight-Core Processor
-BenchmarkERAFFile_Marshal-8                   178833              5904 ns/op
-BenchmarkERAFFile_MarshalToFile-8               1910            605504 ns/op
+BenchmarkUnmarshalFromFile-8       15057             83189 ns/op
+BenchmarkUnmarshalBytes-8       26284489                43.90 ns/op
+BenchmarkMarshal-8               7802852               158.0 ns/op
+BenchmarkMarshalToFile-8          139986              8587 ns/op
 PASS
+coverage: 78.1% of statements
 ```

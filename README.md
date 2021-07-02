@@ -74,15 +74,15 @@ You can either read an *ERAF* container from an ``io.Reader`` or directly from a
 // from an io.Reader
 resp, _ := http.Do(req)
 defer resp.Body.Close()
-var container eraf.Container
+container := &eraf.Container{}
 err := eraf.Unmarshal(resp.Body, &container)
 
 // or directly from a file
-var container eraf.Container
+container := &eraf.Container{}
 err := eraf.UnmarshalFromFile("somefile.eraf", &container) // Again, the extension doesn't matter
 
 // or from a []byte
-var container *eraf.Container
+container := &eraf.Container{}
 err := eraf.UnmarshalBytes(somebytes, container)
 ```
 
@@ -90,6 +90,7 @@ The *ERAF* container implements the ``io.Reader`` interface, so you can supply i
 body parameter for HTTP requests which will read the whole container into the request body:
 
 ```golang
+container := &eraf.Container{}
 req, err := http.NewRequest(http.MethodPost, "https://some-url.com/", container)
 ```
 
@@ -113,7 +114,7 @@ payloadLen := container.PayloadLen()
 Get the version as a proper Semantic Version string:
 
 ```golang
-versionStr := container.Version() // e.g. 2.14.8, the build version is ignored
+versionStr := container.GetVersion() // e.g. 2.14.8, the build version is ignored
 ```
 
 For every ``Set`` method there is an equal ``Get`` method you can use to read the field from

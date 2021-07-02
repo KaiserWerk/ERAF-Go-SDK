@@ -14,7 +14,7 @@ This is a prototype implementation, using BigEndian, currently only tested on wi
 
 * Tests on other OS/Arch combinations
 * Stress tests to check overall performance
-* Integration tests
+* Integration tests in example applications
 
 ## Purpose
 

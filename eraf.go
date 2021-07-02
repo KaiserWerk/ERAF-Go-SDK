@@ -251,9 +251,7 @@ func (c *Container) MarshalToFile(file string) error {
 
 // Marshal serializes the ERAF file into the given io.Writer
 func (c *Container) Marshal(w io.Writer) error {
-
 	total := c.MarshalBytes()
-
 	_, err := w.Write(total)
 
 	return err
@@ -629,6 +627,7 @@ func encryptAes(key, s, nonce []byte) ([]byte, error) {
 		return nil, fmt.Errorf("expected key length 32, 24 or 16, got %d", len(key))
 	}
 
+	// don't decrypt if source is empty
 	if len(s) == 0 {
 		return []byte{}, nil
 	}
@@ -658,6 +657,7 @@ func decryptAes(key, s, nonce []byte) ([]byte, error) {
 		return nil, fmt.Errorf("expected key length 32, 24 or 16, got %d", len(key))
 	}
 
+	// don't encrypt if source is empty
 	if len(s) == 0 {
 		return []byte{}, nil
 	}

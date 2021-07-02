@@ -31,13 +31,13 @@ func BenchmarkUnmarshalFromFile(b *testing.B) {
 
 func BenchmarkUnmarshalBytes(b *testing.B) {
 	var (
-		start = New()
 		container = New()
+		s = New().MarshalBytes()
 		err error
 	)
 
 	for i := 0; i < b.N; i++ {
-		err = UnmarshalBytes(start.Bytes(), container)
+		err = UnmarshalBytes(s, container)
 		if err != nil {
 			b.Fatal(err.Error())
 		}
@@ -111,31 +111,6 @@ func TestContainer_Headers(t *testing.T) {
 	c := New()
 	if len(c.Headers()) != int(headerSize) {
 		t.Fatal("wrong header block size")
-	}
-}
-
-func TestContainer_Bytes(t *testing.T) {
-	tests := []struct {
-		name   string
-		container *Container
-		wantedLength int
-	}{
-		{name: "empty", container: New(), wantedLength: 45},
-		{name: "empty with version", container: func() *Container {
-			return New().SetVersionMajor(14).
-				SetVersionMinor(4).
-				SetVersionPatch(144)
-		}(), wantedLength: 45},
-		{name: "with token", container: func() *Container {
-			return New().SetToken([]byte("123abc456def"))
-		}(), wantedLength: 57},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.container.Bytes(); len(got) != tt.wantedLength {
-				t.Errorf("len(Bytes()) = %v, want %v", len(got), tt.wantedLength)
-			}
-		})
 	}
 }
 

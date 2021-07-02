@@ -6,7 +6,7 @@ a person, a device, an app, an endpoint or whatever it is you want to authentica
 There is of course some slight overhead. The data fields, like ``Certificate`` or ``Nonce`` can all
 be empty, but there is always space reserved for headers, even if no data has been set yet.
 This overhead currently amounts to __42 bytes__, plus 3 bytes for the version. If this is acceptable
-for your use case, please give it a try out and give feedback whether it works out for you.
+for your use case, please give it a try and send feedback if it works out for you.
 
 ## Due tests
 

@@ -629,6 +629,14 @@ func encryptAes(key, s, nonce []byte) ([]byte, error) {
 		return nil, fmt.Errorf("expected key length 32, 24 or 16, got %d", len(key))
 	}
 
+	if len(s) == 0 {
+		return []byte{}, nil
+	}
+
+	if len(nonce) == 0 {
+		return nil, fmt.Errorf("missing nonce")
+	}
+
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -638,9 +646,9 @@ func encryptAes(key, s, nonce []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("unencrypted:", s)
+
 	b := aesGcm.Seal(nil, nonce, s, nil)
-	fmt.Println("encrypted:", b)
+
 
 	return b, nil
 }
@@ -648,6 +656,14 @@ func encryptAes(key, s, nonce []byte) ([]byte, error) {
 func decryptAes(key, s, nonce []byte) ([]byte, error) {
 	if len(key) != 32 && len(key) != 24 && len(key) != 16 {
 		return nil, fmt.Errorf("expected key length 32, 24 or 16, got %d", len(key))
+	}
+
+	if len(s) == 0 {
+		return []byte{}, nil
+	}
+
+	if len(nonce) == 0 {
+		return nil, fmt.Errorf("missing nonce")
 	}
 
 	block, err := aes.NewCipher(key)

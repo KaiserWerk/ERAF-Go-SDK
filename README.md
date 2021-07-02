@@ -157,7 +157,7 @@ This method replaces all field values with their respective encrypted values.
 The decryption processes are the exact inverse of the encryption processes. E.g. use
 ``b, err := container.DecryptEmail(key)`` to just decrypt the email.
 
-Otherwise, use ``err := container.DecryptEverything(key)`` to simply decrypt every field.
+Otherwise, use ``err := container.DecryptEverything(key)`` to simply decrypt every field in place.
 
 ## Tests
 

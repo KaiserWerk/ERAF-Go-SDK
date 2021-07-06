@@ -29,8 +29,7 @@ This is just one example of the many possible use cases.
 
 ### Creating and Marshalling
 
-First, create a new ``*eraf.Container`` with the ``eraf.New()`` function (this is required so that 
-headers are set up correctly) and fill it with data. ``Set`` calls can be chained.
+First, create a new ``*eraf.Container`` and fill it with data. ``Set`` calls can be chained.
 
 ```golang
 cert, _ := ioutil.ReadFile("localhost.cert")

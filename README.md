@@ -64,7 +64,7 @@ The fields are not exported, that means they cannot be accessed directly. Instea
 a getter for each field.
 
 The maximum size (amount of bytes) you can put into any field is that of an unsigned 16 bit integer, that
-means 65,535 bytes which is about 64 KiB.
+means **65,535** bytes which is about 64 KiB. Byte slices too large will be truncated.
 
 Now, you can either marshal (serialize) the created *ERAF* container into an ``io.Writer``, directly 
 into a file or into a byte slice:

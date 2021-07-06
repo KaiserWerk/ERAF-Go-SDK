@@ -183,6 +183,10 @@ The decryption processes are the exact inverse of the encryption processes. E.g.
 
 Otherwise, use ``err := container.DecryptEverything(key)`` to simply decrypt every field in place.
 
+## Examples
+
+Complete usage examples can soon be found in the ``examples`` folder.
+
 ## Tests
 
 ### Unit tests

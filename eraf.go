@@ -34,20 +34,20 @@ var (
 
 // Container is the central struct to work with
 type Container struct {
-	headers            [headerSize]byte
-	versionMajor       byte
-	versionMinor       byte
-	versionPatch       byte
-	nonce              []byte
-	tag                []byte
-	serialNumber       []byte
-	personalIdentifier []byte
-	certificate        []byte
-	privateKey         []byte
-	email              []byte
-	username           []byte
-	token              []byte
-	signature          []byte
+	headers      [headerSize]byte
+	versionMajor byte
+	versionMinor byte
+	versionPatch byte
+	nonce        []byte
+	tag          []byte
+	serialNumber []byte
+	identifier   []byte
+	certificate  []byte
+	privateKey   []byte
+	email        []byte
+	username     []byte
+	token        []byte
+	signature    []byte
 }
 
 func New() *Container {
@@ -90,6 +90,8 @@ func (c *Container) GetNonce() []byte {
 func (c *Container) SetNonce(n []byte) *Container {
 	if len(n) <= blockMaxSize {
 		c.nonce = n
+	} else {
+		c.nonce = n[:blockMaxSize]
 	}
 	return c
 }
@@ -101,6 +103,8 @@ func (c *Container) GetTag() []byte {
 func (c *Container) SetTag(t []byte) *Container {
 	if len(t) <= blockMaxSize {
 		c.tag = t
+	} else {
+		c.tag = t[:blockMaxSize]
 	}
 	return c
 }
@@ -112,17 +116,21 @@ func (c *Container) GetSerialNumber() []byte {
 func (c *Container) SetSerialNumber(sn []byte) *Container {
 	if len(sn) <= blockMaxSize {
 		c.serialNumber = sn
+	} else {
+		c.serialNumber = sn[:blockMaxSize]
 	}
 	return c
 }
 
-func (c *Container) GetPersonalIdentifier() []byte {
-	return c.personalIdentifier
+func (c *Container) GetIdentifier() []byte {
+	return c.identifier
 }
 
-func (c *Container) SetPersonalIdentifier(pi []byte) *Container {
-	if len(pi) <= blockMaxSize {
-		c.personalIdentifier = pi
+func (c *Container) SetIdentifier(id []byte) *Container {
+	if len(id) <= blockMaxSize {
+		c.identifier = id
+	} else {
+		c.identifier = id[:blockMaxSize]
 	}
 	return c
 }
@@ -134,6 +142,8 @@ func (c *Container) GetCertificate() []byte {
 func (c *Container) SetCertificate(cert []byte) *Container {
 	if len(cert) <= blockMaxSize {
 		c.certificate = cert
+	} else {
+		c.certificate = cert[:blockMaxSize]
 	}
 	return c
 }
@@ -145,6 +155,8 @@ func (c *Container) GetPrivateKey() []byte {
 func (c *Container) SetPrivateKey(pk []byte) *Container {
 	if len(pk) <= blockMaxSize {
 		c.privateKey = pk
+	} else {
+		c.privateKey = pk[:blockMaxSize]
 	}
 	return c
 }
@@ -156,6 +168,8 @@ func (c *Container) GetEmail() []byte {
 func (c *Container) SetEmail(e []byte) *Container {
 	if len(e) <= blockMaxSize {
 		c.email = e
+	} else {
+		c.email = e[:blockMaxSize]
 	}
 	return c
 }
@@ -167,6 +181,8 @@ func (c *Container) GetUsername() []byte {
 func (c *Container) SetUsername(u []byte) *Container {
 	if len(u) <= blockMaxSize {
 		c.username = u
+	} else {
+		c.username = u[:blockMaxSize]
 	}
 	return c
 }
@@ -178,6 +194,8 @@ func (c *Container) GetToken() []byte {
 func (c *Container) SetToken(t []byte) *Container {
 	if len(t) <= blockMaxSize {
 		c.token = t
+	} else {
+		c.token = t[:blockMaxSize]
 	}
 	return c
 }
@@ -189,6 +207,8 @@ func (c *Container) GetSignature() []byte {
 func (c *Container) SetSignature(sig []byte) *Container {
 	if len(sig) <= blockMaxSize {
 		c.signature = sig
+	} else {
+		c.signature = sig[:blockMaxSize]
 	}
 	return c
 }
@@ -210,7 +230,7 @@ func (c *Container) HeaderLen() int {
 
 // PayloadLen returns the amount of bytes the payload takes up
 func (c *Container) PayloadLen() int {
-	return 3 + len(c.nonce) + len(c.tag) + len(c.serialNumber) + len(c.personalIdentifier) + len(c.certificate) +
+	return 3 + len(c.nonce) + len(c.tag) + len(c.serialNumber) + len(c.identifier) + len(c.certificate) +
 		len(c.privateKey) + len(c.email) + len(c.username) + len(c.token) + len(c.signature)
 }
 
@@ -229,7 +249,7 @@ func (c *Container) Payload() []byte {
 	b := append([]byte{c.versionMajor, c.versionMinor, c.versionPatch}, c.nonce...)
 	b = append(b, c.tag...)
 	b = append(b, c.serialNumber...)
-	b = append(b, c.personalIdentifier...)
+	b = append(b, c.identifier...)
 	b = append(b, c.certificate...)
 	b = append(b, c.privateKey...)
 	b = append(b, c.email...)
@@ -265,7 +285,7 @@ func (c *Container) MarshalBytes() []byte {
 		nonceLength       = uint16(len(c.nonce))
 		tagLength         = uint16(len(c.tag))
 		snLength          = uint16(len(c.serialNumber))
-		piLength          = uint16(len(c.personalIdentifier))
+		piLength          = uint16(len(c.identifier))
 		certificateLength = uint16(len(c.certificate))
 		privKeyLength     = uint16(len(c.privateKey))
 		emailLength       = uint16(len(c.email))
@@ -333,7 +353,7 @@ func (c *Container) MarshalBytes() []byte {
 	payload := append([]byte{c.versionMajor, c.versionMinor, c.versionPatch}, c.nonce...)
 	payload = append(payload, c.tag...)
 	payload = append(payload, c.serialNumber...)
-	payload = append(payload, c.personalIdentifier...)
+	payload = append(payload, c.identifier...)
 	payload = append(payload, c.certificate...)
 	payload = append(payload, c.privateKey...)
 	payload = append(payload, c.email...)
@@ -408,7 +428,7 @@ func UnmarshalBytes(allBytes []byte, target *Container) error {
 	piPosition := binary.BigEndian.Uint16(headers[14:16])
 	piLength := binary.BigEndian.Uint16(headers[16:18])
 	piBytes := payload[piPosition : piPosition+piLength]
-	target.personalIdentifier = piBytes
+	target.identifier = piBytes
 
 	// Certificate
 	certPosition := binary.BigEndian.Uint16(headers[18:20])
@@ -473,7 +493,7 @@ func (c *Container) EncryptEverything(key []byte) error {
 	if b, err = c.EncryptPersonalIdentifier(key); err != nil {
 		return err
 	}
-	c.personalIdentifier = b
+	c.identifier = b
 
 	if b, err = c.EncryptCertificate(key); err != nil {
 		return err
@@ -513,7 +533,7 @@ func (c *Container) EncryptSerialNumber(key []byte) ([]byte, error) {
 }
 
 func (c *Container) EncryptPersonalIdentifier(key []byte) ([]byte, error) {
-	return encryptAes(key, c.personalIdentifier, c.nonce)
+	return encryptAes(key, c.identifier, c.nonce)
 }
 
 func (c *Container) EncryptCertificate(key []byte) ([]byte, error) {
@@ -555,7 +575,7 @@ func (c *Container) DecryptEverything(key []byte) error {
 	if b, err = c.DecryptPersonalIdentifier(key); err != nil {
 		return err
 	}
-	c.personalIdentifier = b
+	c.identifier = b
 
 	if b, err = c.DecryptCertificate(key); err != nil {
 		return err
@@ -595,7 +615,7 @@ func (c *Container) DecryptSerialNumber(key []byte) ([]byte, error) {
 }
 
 func (c *Container) DecryptPersonalIdentifier(key []byte) ([]byte, error) {
-	return decryptAes(key, c.personalIdentifier, c.nonce)
+	return decryptAes(key, c.identifier, c.nonce)
 }
 
 func (c *Container) DecryptCertificate(key []byte) ([]byte, error) {

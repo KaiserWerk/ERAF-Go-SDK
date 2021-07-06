@@ -153,7 +153,7 @@ func TestContainer_PayloadLen(t *testing.T) {
 	}{
 		{name: "empty", container: New(), want: 3},
 		{name: "with personal identifier", container: func() *Container {
-			return New().SetPersonalIdentifier([]byte{1, 3, 5, 7, 9})
+			return New().SetIdentifier([]byte{1, 3, 5, 7, 9})
 		}(), want: 8},
 	}
 	for _, tt := range tests {

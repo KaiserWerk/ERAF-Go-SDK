@@ -52,7 +52,7 @@ Available fields (or data blocks) for you to use are as follows:
 * ``Nonce``
 * ``Tag``
 * ``SerialNumber``
-* ``PersonalIdentifier``
+* ``Identifier``
 * ``Certificate``
 * ``PrivateKey``
 * ``Email``

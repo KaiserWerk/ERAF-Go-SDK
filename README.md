@@ -25,7 +25,7 @@ via HTTP or email. You can for example use the ``Nonce`` and ``Tag`` fields to s
 encryption of the data (e.g. the certificate) and decrypt the content at the recipient's device.
 This is just one example of the many possible use cases.
 
-## Examples
+## Usage
 
 ### Creating and Marshalling
 
@@ -44,8 +44,30 @@ container.
 	SetSignature(sig[:])
 ```
 
-Now, you can either marshal (serialize) the created *ERAF* container into an ``io.Writer`` 
-or directly into a file:
+Available fields (or data blocks) for you to use are as follows:
+
+* ``VersionMajor`` 
+* ``VersionMinor`` 
+* ``VersionPatch``
+* ``Nonce``
+* ``Tag``
+* ``SerialNumber``
+* ``PersonalIdentifier``
+* ``Certificate``
+* ``PrivateKey``
+* ``Email``
+* ``Username``
+* ``Token``
+* ``Signature``
+
+The fields are not exported, that means they cannot be accessed directly. Instead, there is a setter and
+a getter for each field.
+
+The maximum size (amount of bytes) you can put into any field is that of an unsigned 16 bit integer, that
+means 65,535 bytes which is about 64 KiB.
+
+Now, you can either marshal (serialize) the created *ERAF* container into an ``io.Writer``, directly 
+into a file or into a byte slice:
 
 ```golang
 // into a buffer
@@ -68,7 +90,7 @@ var s []byte = container.MarshalBytes()
 
 ### Reading and Unmarshalling
 
-You can either read an *ERAF* container from an ``io.Reader`` or directly from a file:
+You can either read an *ERAF* container from an ``io.Reader``, directly from a file or from a byte slice:
 
 ```golang
 // from an io.Reader
@@ -90,7 +112,9 @@ The *ERAF* container implements the ``io.Reader`` interface, so you can supply i
 body parameter for HTTP requests which will read the whole container into the request body:
 
 ```golang
-container := &eraf.Container{}
+container := &eraf.Container{
+	// ...
+}
 req, err := http.NewRequest(http.MethodPost, "https://some-url.com/", container)
 ```
 
@@ -111,10 +135,10 @@ payloadLen := container.PayloadLen()
 
 ### Obtaining data
 
-Get the version as a proper Semantic Version string:
+Get the version as a properly constructed Semantic Version string:
 
 ```golang
-versionStr := container.GetVersion() // e.g. 2.14.8, the build version is ignored
+versionStr := container.GetSemVer() // e.g. 2.14.8
 ```
 
 For every ``Set`` method there is an equal ``Get`` method you can use to read the field from
@@ -128,7 +152,7 @@ u := container.GetUsername()
 // ...
 ```
 
-You can get just the headers and just the payload for custom parsing as you need:
+You can get just the headers or just the payload for custom parsing as you need:
 
 ```golang
 // Just the headers
@@ -142,7 +166,7 @@ payload := container.Payload()
 
 ### Encryption
 
-For every field, there is a method to encrypt it, e.g. for field ``email`` there is a method
+For every field, there is a method to encrypt it, e.g. for field ``Email`` there is a method
 ``b, err := container.EncryptEmail(key)`` which returns the email encrypted with AES using 
 the given key.
 A nonce is required and must be set beforehand using the ``SetNonce(n)`` method, otherwise an 
@@ -156,7 +180,7 @@ This method replaces all field values with their respective encrypted values.
 ### Decryption
 
 The decryption processes are the exact inverse of the encryption processes. E.g. use
-``b, err := container.DecryptEmail(key)`` to just decrypt the email.
+``email, err := container.DecryptEmail(key)`` to just decrypt the email.
 
 Otherwise, use ``err := container.DecryptEverything(key)`` to simply decrypt every field in place.
 

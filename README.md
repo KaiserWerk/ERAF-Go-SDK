@@ -8,12 +8,20 @@ be empty, but there is always space reserved for headers, even if no data has be
 This overhead currently amounts to __42 bytes__, plus 3 bytes for the version. If this is acceptable
 for your use case, please give it a try and send feedback if it works out for you.
 
+This is **Work in Progress** which means the library is still everchanging but currently mostly stable
+and version 1 will arrive soon.
+
 ## Due tests
 
-This is a prototype implementation, using BigEndian, currently only tested on windows/amd64.
+### Tested successfully on
+
+* windows/amd64
+* linux/amd64
+* darwin/amd64
+
+### Not yet tested
 
 * Tests on other OS/Arch combinations
-* Stress tests to check overall performance
 * Integration tests in example applications
 
 ## Purpose
@@ -185,7 +193,8 @@ Otherwise, use ``err := container.DecryptEverything(key)`` to simply decrypt eve
 
 ## Examples
 
-Complete usage examples can soon be found in the ``examples`` folder.
+Complete usage examples can soon be found in the ``examples`` folder once a stable version is 
+available.
 
 ## Tests
 

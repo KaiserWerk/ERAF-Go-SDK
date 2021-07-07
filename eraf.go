@@ -54,6 +54,7 @@ type Container struct {
 	rootCertificate []byte
 }
 
+// New creates a new *Container. Just convenience, not necessary.
 func New() *Container {
 	return &Container{
 		headers: headerBlock,

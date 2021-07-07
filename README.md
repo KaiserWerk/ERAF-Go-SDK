@@ -39,8 +39,9 @@ This is just one example of the many possible use cases.
 
 ## Installation
 
-Once the first stable version is tagged, you can install it with
-``go get -u github.com/KaiserWerk/ERAF-Go-SDK@v1``
+Once the first stable version is tagged, you can download it with
+``go get -u github.com/KaiserWerk/ERAF-Go-SDK@v1.0.0`` and add the import line 
+``eraf "github.com/KaiserWerk/ERAF-Go-SDK`` to your Go file(s).
 
 If you want the bleeding edge version from the master branch, just drop the ``@version``.
 
@@ -226,8 +227,8 @@ Otherwise, use ``err := container.DecryptEverything(key)`` to simply decrypt eve
 
 ## Examples
 
-Complete usage examples can soon be found in the ``examples`` folder once a stable version is 
-available.
+1. [Simple example with encryption](examples/simple-encryption/main.go)
+1. [Extended example with encryption and (un)marshalling](examples/extended-encryption-and-marshalling/main.go)
 
 ## Tests
 

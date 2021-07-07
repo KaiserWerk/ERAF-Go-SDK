@@ -10,8 +10,8 @@ import (
 func BenchmarkUnmarshalFromFile(b *testing.B) {
 	const filename = "__bench_unmarshal_from_file.eraf"
 	var (
-		start = New()
-		err error
+		start     = New()
+		err       error
 		container = New()
 	)
 
@@ -32,8 +32,8 @@ func BenchmarkUnmarshalFromFile(b *testing.B) {
 func BenchmarkUnmarshalBytes(b *testing.B) {
 	var (
 		container = New()
-		s = New().MarshalBytes()
-		err error
+		s         = New().MarshalBytes()
+		err       error
 	)
 
 	for i := 0; i < b.N; i++ {
@@ -47,7 +47,7 @@ func BenchmarkUnmarshalBytes(b *testing.B) {
 func BenchmarkMarshal(b *testing.B) {
 	var (
 		container = New()
-		err error
+		err       error
 	)
 	for i := 0; i < b.N; i++ {
 		err = container.Marshal(io.Discard)
@@ -61,7 +61,7 @@ func BenchmarkMarshalToFile(b *testing.B) {
 	const filename = "__bench_marshal_to_file.eraf"
 	var (
 		container = New()
-		err error
+		err       error
 	)
 	fh, err := os.Create(filename)
 	if err != nil {
@@ -84,9 +84,9 @@ func BenchmarkMarshalToFile(b *testing.B) {
 func TestContainer_Payload(t *testing.T) {
 
 	tests := []struct {
-		name   string
+		name      string
 		container *Container
-		want   []byte
+		want      []byte
 	}{
 		{name: "empty", container: New(), want: []byte{0, 0, 0}},
 		{name: "empty with version", container: func() *Container {
@@ -119,16 +119,16 @@ func TestContainer_Read(t *testing.T) {
 		s []byte
 	}
 	tests := []struct {
-		name    string
+		name      string
 		container *Container
-		args    args
-		want    int
-		wantErr bool
+		args      args
+		want      int
+		wantErr   bool
 	}{
 		{name: "empty", container: New(), args: args{s: []byte{}}, want: 45, wantErr: false},
 		{name: "with email", container: func() *Container {
 			return New().SetEmail([]byte("my@cool-domain.com"))
-		}(), args: args{s:[]byte{}}, want: 63, wantErr: false},
+		}(), args: args{s: []byte{}}, want: 63, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -147,9 +147,9 @@ func TestContainer_Read(t *testing.T) {
 
 func TestContainer_PayloadLen(t *testing.T) {
 	tests := []struct {
-		name   string
+		name      string
 		container *Container
-		want   int
+		want      int
 	}{
 		{name: "empty", container: New(), want: 3},
 		{name: "with personal identifier", container: func() *Container {
@@ -167,9 +167,9 @@ func TestContainer_PayloadLen(t *testing.T) {
 
 func TestContainer_HeaderLen(t *testing.T) {
 	tests := []struct {
-		name   string
+		name      string
 		container *Container
-		want   int
+		want      int
 	}{
 		{name: "normal", container: New(), want: int(headerSize)},
 	}

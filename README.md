@@ -75,6 +75,7 @@ Available fields (or data blocks) for you to use are as follows:
 * ``Username``
 * ``Token``
 * ``Signature``
+* ``RootCertificate``
 
 The fields are not exported, that means they cannot be accessed directly. Instead, there is a setter and
 a getter for each field.

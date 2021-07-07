@@ -10,7 +10,7 @@ be empty, but there is always space reserved for headers, even if no data has be
 This overhead currently amounts to __46 bytes__, plus 3 bytes for the version. If this is acceptable
 for your use case, please give it a try and send feedback if it works out for you.
 
-This is **Work in Progress** which means the library is still everchanging but currently mostly stable
+This is **Work in Progress** which means the library is still changing but currently mostly stable
 and version 1 will arrive soon.
 
 ## Due tests
@@ -23,7 +23,7 @@ and version 1 will arrive soon.
 
 ### Not yet tested
 
-* Tests on other OS/Arch combinations
+* Tests on other OS/Arch combinations ([Issue #4](https://github.com/KaiserWerk/ERAF-Go-SDK/issues/4)) 
 * Integration tests in example applications
 
 ## Purpose
@@ -37,16 +37,17 @@ This is just one example of the many possible use cases.
 
 ## Installation
 
-Once a stable version is tagged, you can install it with
-``go get -u github.com/KaiserWerk/ERAF-Go-SDK@1.0.0``
+Once the first stable version is tagged, you can install it with
+``go get -u github.com/KaiserWerk/ERAF-Go-SDK@v1``
 
-If you want the bleeding edge version from the master branch, just drop the @version.
+If you want the bleeding edge version from the master branch, just drop the ``@version``.
 
 ## Usage
 
 ### Creating and Marshalling
 
-First, create a new ``*eraf.Container`` and fill it with data. ``Set`` calls can be chained.
+First, create a new ``*eraf.Container`` and fill it with data. ``Set`` calls for setting fields
+can be chained.
 
 ```golang
 cert, _ := ioutil.ReadFile("localhost.cert")
@@ -60,7 +61,7 @@ container.
 	SetSignature(sig[:])
 ```
 
-Available fields (or data blocks) for you to use are as follows:
+Available fields (that means data blocks) for you to use are as follows:
 
 * ``VersionMajor`` 
 * ``VersionMinor`` 

@@ -35,20 +35,21 @@ var (
 
 // Container is the central struct to work with
 type Container struct {
-	headers      [headerSize]byte
-	versionMajor byte
-	versionMinor byte
-	versionPatch byte
-	nonce        []byte
-	tag          []byte
-	serialNumber []byte
-	identifier   []byte
-	certificate  []byte
-	privateKey   []byte
-	email        []byte
-	username     []byte
-	token        []byte
-	signature    []byte
+	headers         [headerSize]byte
+	versionMajor    byte
+	versionMinor    byte
+	versionPatch    byte
+	nonce           []byte
+	tag             []byte
+	serialNumber    []byte
+	identifier      []byte
+	certificate     []byte
+	privateKey      []byte
+	email           []byte
+	username        []byte
+	token           []byte
+	signature       []byte
+	rootCertificate []byte
 }
 
 func New() *Container {
@@ -57,165 +58,217 @@ func New() *Container {
 	}
 }
 
+// GetVersionMajor returns the major version
 func (c *Container) GetVersionMajor() byte {
 	return c.versionMajor
 }
 
+// SetVersionMajor sets the major version
 func (c *Container) SetVersionMajor(v byte) *Container {
 	c.versionMajor = v
 	return c
 }
 
+// GetVersionMinor returns the minor version
 func (c *Container) GetVersionMinor() byte {
 	return c.versionMinor
 }
 
+// SetVersionMinor sets the minor version
 func (c *Container) SetVersionMinor(v byte) *Container {
 	c.versionMinor = v
 	return c
 }
 
+// GetVersionPatch returns the patch version
 func (c *Container) GetVersionPatch() byte {
 	return c.versionPatch
 }
 
+// SetVersionPatch sets the patch version
 func (c *Container) SetVersionPatch(v byte) *Container {
 	c.versionPatch = v
 	return c
 }
 
+// GetNonce returns the nonce
 func (c *Container) GetNonce() []byte {
 	return c.nonce
 }
 
+// SetNonce sets a nonce
 func (c *Container) SetNonce(n []byte) *Container {
 	if len(n) <= blockMaxSize {
 		c.nonce = n
 	} else {
 		c.nonce = n[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
+// GetTag returns the tag
 func (c *Container) GetTag() []byte {
 	return c.tag
 }
 
+// SetTag sets a tag
 func (c *Container) SetTag(t []byte) *Container {
 	if len(t) <= blockMaxSize {
 		c.tag = t
 	} else {
 		c.tag = t[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
+// GetSerialNumber returns the serial number
 func (c *Container) GetSerialNumber() []byte {
 	return c.serialNumber
 }
 
+// SetSerialNumber sets a serial number
 func (c *Container) SetSerialNumber(sn []byte) *Container {
 	if len(sn) <= blockMaxSize {
 		c.serialNumber = sn
 	} else {
 		c.serialNumber = sn[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
+// GetIdentifier returns the identifier
 func (c *Container) GetIdentifier() []byte {
 	return c.identifier
 }
 
+// SetIdentifier sets an identifier
 func (c *Container) SetIdentifier(id []byte) *Container {
 	if len(id) <= blockMaxSize {
 		c.identifier = id
 	} else {
 		c.identifier = id[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
+// GetCertificate returns the certificate
 func (c *Container) GetCertificate() []byte {
 	return c.certificate
 }
 
+// SetCertificate sets a certificate
 func (c *Container) SetCertificate(cert []byte) *Container {
 	if len(cert) <= blockMaxSize {
 		c.certificate = cert
 	} else {
 		c.certificate = cert[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
+// GetPrivateKey returns the private key
 func (c *Container) GetPrivateKey() []byte {
 	return c.privateKey
 }
 
+// SetPrivateKey sets a private key
 func (c *Container) SetPrivateKey(pk []byte) *Container {
 	if len(pk) <= blockMaxSize {
 		c.privateKey = pk
 	} else {
 		c.privateKey = pk[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
+// GetEmail returns the email address
 func (c *Container) GetEmail() []byte {
 	return c.email
 }
 
+// SetEmail sets an email address
 func (c *Container) SetEmail(e []byte) *Container {
 	if len(e) <= blockMaxSize {
 		c.email = e
 	} else {
 		c.email = e[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
+// GetUsername returns the username
 func (c *Container) GetUsername() []byte {
 	return c.username
 }
 
+// SetUsername sets a username
 func (c *Container) SetUsername(u []byte) *Container {
 	if len(u) <= blockMaxSize {
 		c.username = u
 	} else {
 		c.username = u[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
+// GetToken returns the token
 func (c *Container) GetToken() []byte {
 	return c.token
 }
 
+// SetToken sets a token
 func (c *Container) SetToken(t []byte) *Container {
 	if len(t) <= blockMaxSize {
 		c.token = t
 	} else {
 		c.token = t[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
+// GetSignature returns the signature
 func (c *Container) GetSignature() []byte {
 	return c.signature
 }
 
+// SetSignature sets a signature
 func (c *Container) SetSignature(sig []byte) *Container {
 	if len(sig) <= blockMaxSize {
 		c.signature = sig
 	} else {
 		c.signature = sig[:blockMaxSize]
 	}
+	c.CalculateHeaders()
 	return c
 }
 
-// GetVersion returns the combination of all version elements as a semantic version string
-func (c *Container) GetVersion() string {
+// GetRootCertificate returns the root certificate
+func (c *Container) GetRootCertificate() []byte {
+	return c.rootCertificate
+}
+
+// SetRootCertificate sets a root certificate
+func (c *Container) SetRootCertificate(rc []byte) *Container {
+	if len(rc) <= blockMaxSize {
+		c.rootCertificate = rc
+	} else {
+		c.rootCertificate = rc[:blockMaxSize]
+	}
+	c.CalculateHeaders()
+	return c
+}
+
+// GetSemVer returns the combination of all version elements as a semantic version string
+func (c *Container) GetSemVer() string {
 	return fmt.Sprintf("%d.%d.%d", c.versionMajor, c.versionMinor, c.versionPatch)
 }
 
@@ -235,8 +288,9 @@ func (c *Container) PayloadLen() int {
 		len(c.privateKey) + len(c.email) + len(c.username) + len(c.token) + len(c.signature)
 }
 
+// Read reads all bytes into s and returns the number of bytes read as well as an error
 func (c *Container) Read(s []byte) (int, error) {
-	s = c.MarshalBytes()
+	copy(s, c.MarshalBytes())
 	return c.Len(), nil
 }
 
@@ -278,6 +332,7 @@ func (c *Container) Marshal(w io.Writer) error {
 	return err
 }
 
+// MarshalBytes serializes the container into a []byte
 func (c *Container) MarshalBytes() []byte {
 	c.CalculateHeaders()
 
@@ -322,6 +377,7 @@ func Unmarshal(r io.Reader, target *Container) error {
 	return UnmarshalBytes(allBytes, target)
 }
 
+// UnmarshalBytes takes a []byte and a pointer to a target container and deserializes the []byte into the container
 func UnmarshalBytes(allBytes []byte, target *Container) error {
 	if len(allBytes) < int(headerSize) {
 		return fmt.Errorf("byte slice is not large enough")
@@ -466,40 +522,53 @@ func (c *Container) EncryptEverything(key []byte) error {
 	return nil
 }
 
+// EncryptSerialNumber encrypts and returns the serial number
 func (c *Container) EncryptSerialNumber(key []byte) ([]byte, error) {
 	return encryptAes(key, c.serialNumber, c.nonce)
 }
 
+// EncryptIdentifier encrypts and returns the identifier
 func (c *Container) EncryptIdentifier(key []byte) ([]byte, error) {
 	return encryptAes(key, c.identifier, c.nonce)
 }
 
+// EncryptCertificate encrypts and returns the certificate
 func (c *Container) EncryptCertificate(key []byte) ([]byte, error) {
 	return encryptAes(key, c.certificate, c.nonce)
 }
 
+// EncryptPrivateKey encrypts and returns the private key
 func (c *Container) EncryptPrivateKey(key []byte) ([]byte, error) {
 	return encryptAes(key, c.privateKey, c.nonce)
 }
 
+// EncryptEmail encrypts and returns the email address
 func (c *Container) EncryptEmail(key []byte) ([]byte, error) {
 	return encryptAes(key, c.email, c.nonce)
 }
 
+// EncryptUsername encrypts and returns the username
 func (c *Container) EncryptUsername(key []byte) ([]byte, error) {
 	return encryptAes(key, c.username, c.nonce)
 }
 
+// EncryptToken encrypts and returns the token
 func (c *Container) EncryptToken(key []byte) ([]byte, error) {
 	return encryptAes(key, c.token, c.nonce)
 }
 
+// EncryptSignature encrypts and returns the signature
 func (c *Container) EncryptSignature(key []byte) ([]byte, error) {
 	return encryptAes(key, c.signature, c.nonce)
 }
 
-// DecryptEverything is the obvious counterpart to EncryptEverything. It performs the decryption in place, using,
-// depending on key length, either AES-128, AES-192 or AES-256.
+// EncryptRootCertificate encrypts and returns the signature
+func (c *Container) EncryptRootCertificate(key []byte) ([]byte, error) {
+	return encryptAes(key, c.rootCertificate, c.nonce)
+}
+
+// DecryptEverything is the obvious counterpart to EncryptEverything. It performs the decryption in place, using
+// either AES-128, AES-192 or AES-256, depending on key length.
 func (c *Container) DecryptEverything(key []byte) error {
 	sn, err := c.DecryptSerialNumber(key)
 	if err != nil {
@@ -520,7 +589,6 @@ func (c *Container) DecryptEverything(key []byte) error {
 	if err != nil {
 		return err
 	}
-
 
 	email, err := c.DecryptEmail(key)
 	if err != nil {
@@ -555,38 +623,52 @@ func (c *Container) DecryptEverything(key []byte) error {
 	return nil
 }
 
+// DecryptSerialNumber decrypts and returns the serial number
 func (c *Container) DecryptSerialNumber(key []byte) ([]byte, error) {
 	return decryptAes(key, c.serialNumber, c.nonce)
 }
 
+// DecryptIdentifier decrypts and returns the identifier
 func (c *Container) DecryptIdentifier(key []byte) ([]byte, error) {
 	return decryptAes(key, c.identifier, c.nonce)
 }
 
+// DecryptCertificate decrypts and returns the certificate
 func (c *Container) DecryptCertificate(key []byte) ([]byte, error) {
 	return decryptAes(key, c.certificate, c.nonce)
 }
 
+// DecryptPrivateKey decrypts and returns the private key
 func (c *Container) DecryptPrivateKey(key []byte) ([]byte, error) {
 	return decryptAes(key, c.privateKey, c.nonce)
 }
 
+// DecryptEmail decrypts and returns the email address
 func (c *Container) DecryptEmail(key []byte) ([]byte, error) {
 	return decryptAes(key, c.email, c.nonce)
 }
 
+// DecryptUsername decrypts and returns the username
 func (c *Container) DecryptUsername(key []byte) ([]byte, error) {
 	return decryptAes(key, c.username, c.nonce)
 }
 
+// DecryptToken decrypts and returns the token
 func (c *Container) DecryptToken(key []byte) ([]byte, error) {
 	return decryptAes(key, c.token, c.nonce)
 }
 
+// DecryptSignature decrypts and returns the signature
 func (c *Container) DecryptSignature(key []byte) ([]byte, error) {
 	return decryptAes(key, c.signature, c.nonce)
 }
 
+// DecryptRootCertificate decrypts and returns the root certificate
+func (c *Container) DecryptRootCertificate(key []byte) ([]byte, error) {
+	return decryptAes(key, c.rootCertificate, c.nonce)
+}
+
+// CalculateHeaders sets the header bytes to correct values corresponding to field offsets and lengths
 func (c *Container) CalculateHeaders() {
 	header := headerBlock[:]
 
@@ -688,7 +770,6 @@ func encryptAes(key, s, nonce []byte) ([]byte, error) {
 	}
 
 	b := aesGcm.Seal(nil, nonce, s, nil)
-
 
 	return b, nil
 }

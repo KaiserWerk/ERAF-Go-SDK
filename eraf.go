@@ -4,6 +4,8 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -270,6 +272,32 @@ func (c *Container) SetRootCertificate(rc []byte) *Container {
 // GetSemVer returns the combination of all version elements as a semantic version string
 func (c *Container) GetSemVer() string {
 	return fmt.Sprintf("%d.%d.%d", c.versionMajor, c.versionMinor, c.versionPatch)
+}
+
+func (c *Container) GetX509Certificate() (*x509.Certificate, error) {
+	if c.certificate == nil {
+		return nil, fmt.Errorf("certificate is nil")
+	}
+	return x509.ParseCertificate(c.certificate)
+}
+
+func (c *Container) GetTlsCertificate() (*tls.Certificate, error) {
+	if c.certificate == nil {
+		return nil, fmt.Errorf("certificate is nil")
+	}
+	if c.privateKey == nil {
+		return nil, fmt.Errorf("private key is nil")
+	}
+
+	cert, err := tls.X509KeyPair(c.certificate, c.privateKey)
+	return &cert, err
+}
+
+func (c *Container) GetX509RootCertificate() (*x509.Certificate, error) {
+	if c.rootCertificate == nil {
+		return nil, fmt.Errorf("root certificate is nil")
+	}
+	return x509.ParseCertificate(c.rootCertificate)
 }
 
 // Len returns the total amount of bytes of the file

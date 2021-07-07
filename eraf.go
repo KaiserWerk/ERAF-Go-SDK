@@ -274,6 +274,7 @@ func (c *Container) GetSemVer() string {
 	return fmt.Sprintf("%d.%d.%d", c.versionMajor, c.versionMinor, c.versionPatch)
 }
 
+// GetX509Certificate returns the certificate as *x509.Certificate
 func (c *Container) GetX509Certificate() (*x509.Certificate, error) {
 	if c.certificate == nil {
 		return nil, fmt.Errorf("certificate is nil")
@@ -281,6 +282,7 @@ func (c *Container) GetX509Certificate() (*x509.Certificate, error) {
 	return x509.ParseCertificate(c.certificate)
 }
 
+// GetTlsCertificate returns the certificate as *tls.Certificate
 func (c *Container) GetTlsCertificate() (*tls.Certificate, error) {
 	if c.certificate == nil {
 		return nil, fmt.Errorf("certificate is nil")
@@ -293,6 +295,7 @@ func (c *Container) GetTlsCertificate() (*tls.Certificate, error) {
 	return &cert, err
 }
 
+// GetX509RootCertificate returns the root certificate as *x509.Certificate
 func (c *Container) GetX509RootCertificate() (*x509.Certificate, error) {
 	if c.rootCertificate == nil {
 		return nil, fmt.Errorf("root certificate is nil")

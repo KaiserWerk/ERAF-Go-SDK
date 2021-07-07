@@ -33,6 +33,13 @@ via HTTP or email. You can for example use the ``Nonce`` and ``Tag`` fields to s
 encryption of the data (e.g. the certificate) and decrypt the content at the recipient's device.
 This is just one example of the many possible use cases.
 
+## Installation
+
+Once a stable version is tagged, you can install it with
+``go get -u github.com/KaiserWerk/ERAF-Go-SDK@1.0.0``
+
+If you want the bleeding edge version from the master branch, just drop the @version.
+
 ## Usage
 
 ### Creating and Marshalling

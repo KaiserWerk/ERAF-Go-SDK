@@ -179,6 +179,26 @@ headers := container.Headers()
 payload := container.Payload()
 ```
 
+### Certificate convenience functions
+
+A basic assumption is that all certificate and private key data set is PEM-encoded.
+For easier certificate handling, there are a few convenience functions:
+
+```golang
+c := &eraf.Container{
+	// some fields
+}
+
+// obtain the certificate bytes as *x509.Certificate
+x509Cert, err := c.GetX509Certificate()
+
+// or certificate and private key combined as *tls.Certificate
+tlsCert, err := c.GetTlsCertificate()
+
+// and the root certificate
+rootCert, err := c.GetX509RootCertificate()
+```
+
 ## Encryption & Decryption
 
 ### Encryption

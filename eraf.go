@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	headerSize   uint8 = 42
+	headerSize   uint8 = 46
 	blockMaxSize int   = 65535
 )
 
@@ -29,6 +29,7 @@ var (
 		0, 0, 0, 0, // username
 		0, 0, 0, 0, // token
 		0, 0, 0, 0, // signature
+		0, 0, 0, 0, // root certificate
 	}
 )
 
@@ -278,77 +279,7 @@ func (c *Container) Marshal(w io.Writer) error {
 }
 
 func (c *Container) MarshalBytes() []byte {
-	header := headerBlock[:]
-
-	var (
-		versionLength     = uint16(3)
-		nonceLength       = uint16(len(c.nonce))
-		tagLength         = uint16(len(c.tag))
-		snLength          = uint16(len(c.serialNumber))
-		piLength          = uint16(len(c.identifier))
-		certificateLength = uint16(len(c.certificate))
-		privKeyLength     = uint16(len(c.privateKey))
-		emailLength       = uint16(len(c.email))
-		usernameLength    = uint16(len(c.username))
-		tokenLength       = uint16(len(c.token))
-		signatureLength   = uint16(len(c.signature))
-	)
-
-	var offset uint16 = 0 //uint16(headerSize)
-
-	// version
-	// no need to set any values
-	offset += versionLength
-
-	// nonce
-	binary.BigEndian.PutUint16(header[2:4], offset)
-	binary.BigEndian.PutUint16(header[4:6], nonceLength)
-	offset += nonceLength
-
-	// tag
-	binary.BigEndian.PutUint16(header[6:8], offset)
-	binary.BigEndian.PutUint16(header[8:10], tagLength)
-	offset += tagLength
-
-	// serial number
-	binary.BigEndian.PutUint16(header[10:12], offset)
-	binary.BigEndian.PutUint16(header[12:14], snLength)
-	offset += snLength
-
-	// personal identifier
-	binary.BigEndian.PutUint16(header[14:16], offset)
-	binary.BigEndian.PutUint16(header[16:18], piLength)
-	offset += piLength
-
-	// certificate
-	binary.BigEndian.PutUint16(header[18:20], offset)
-	binary.BigEndian.PutUint16(header[20:22], certificateLength)
-	offset += certificateLength
-
-	// private key
-	binary.BigEndian.PutUint16(header[22:24], offset)
-	binary.BigEndian.PutUint16(header[24:26], privKeyLength)
-	offset += privKeyLength
-
-	// email
-	binary.BigEndian.PutUint16(header[26:28], offset)
-	binary.BigEndian.PutUint16(header[28:30], emailLength)
-	offset += emailLength
-
-	// username
-	binary.BigEndian.PutUint16(header[30:32], offset)
-	binary.BigEndian.PutUint16(header[32:34], usernameLength)
-	offset += usernameLength
-
-	// token
-	binary.BigEndian.PutUint16(header[34:36], offset)
-	binary.BigEndian.PutUint16(header[36:38], tokenLength)
-	offset += tokenLength
-
-	// signature
-	binary.BigEndian.PutUint16(header[38:40], offset)
-	binary.BigEndian.PutUint16(header[40:], signatureLength) // leave upper bound open
-	//offset += signatureLength // no need to increase this further
+	c.CalculateHeaders()
 
 	payload := append([]byte{c.versionMajor, c.versionMinor, c.versionPatch}, c.nonce...)
 	payload = append(payload, c.tag...)
@@ -361,7 +292,8 @@ func (c *Container) MarshalBytes() []byte {
 	payload = append(payload, c.token...)
 	payload = append(payload, c.signature...)
 
-	total := append(header, payload...)
+	h := c.Headers()
+	total := append(h[:], payload...)
 	return total
 }
 
@@ -392,7 +324,7 @@ func Unmarshal(r io.Reader, target *Container) error {
 
 func UnmarshalBytes(allBytes []byte, target *Container) error {
 	if len(allBytes) < int(headerSize) {
-		return fmt.Errorf("buffer is not large enough")
+		return fmt.Errorf("byte slice is not large enough")
 	}
 	headers := allBytes[:headerSize]
 	copy(target.headers[:], headers)
@@ -473,11 +405,6 @@ func UnmarshalBytes(allBytes []byte, target *Container) error {
 // meta data; if already set, it will be overwritten. All block will be encrypted and written back, no data is
 // returned. Requires a key with a length of 16 bytes (AES-128), 24 bytes (AES-192) or 32 bytes (AES-256).
 func (c *Container) EncryptEverything(key []byte) error {
-	var (
-		b []byte
-		err error
-	)
-
 	// create and set nonce for further use
 	nonce := make([]byte, 12)
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
@@ -485,45 +412,56 @@ func (c *Container) EncryptEverything(key []byte) error {
 	}
 	c.nonce = nonce
 
-	if b, err = c.EncryptSerialNumber(key); err != nil {
+	sn, err := c.EncryptSerialNumber(key)
+	if err != nil {
 		return err
 	}
-	c.serialNumber = b
 
-	if b, err = c.EncryptPersonalIdentifier(key); err != nil {
+	id, err := c.EncryptIdentifier(key)
+	if err != nil {
 		return err
 	}
-	c.identifier = b
 
-	if b, err = c.EncryptCertificate(key); err != nil {
+	cert, err := c.EncryptCertificate(key)
+	if err != nil {
 		return err
 	}
-	c.certificate = b
 
-	if b, err = c.EncryptPrivateKey(key); err != nil {
+	pk, err := c.EncryptPrivateKey(key)
+	if err != nil {
 		return err
 	}
-	c.privateKey = b
 
-	if b, err = c.EncryptEmail(key); err != nil {
+	email, err := c.EncryptEmail(key)
+	if err != nil {
 		return err
 	}
-	c.email = b
 
-	if b, err = c.EncryptUsername(key); err != nil {
+	username, err := c.EncryptUsername(key)
+	if err != nil {
 		return err
 	}
-	c.username = b
 
-	if b, err = c.EncryptToken(key); err != nil {
+	token, err := c.EncryptToken(key)
+	if err != nil {
 		return err
 	}
-	c.token = b
 
-	if b, err = c.EncryptSignature(key); err != nil {
+	sig, err := c.EncryptSignature(key)
+	if err != nil {
 		return err
 	}
-	c.signature = b
+
+	// everything or nothing
+	// set the values only if no error occurs
+	c.serialNumber = sn
+	c.identifier = id
+	c.certificate = cert
+	c.privateKey = pk
+	c.email = email
+	c.username = username
+	c.token = token
+	c.signature = sig
 
 	return nil
 }
@@ -532,7 +470,7 @@ func (c *Container) EncryptSerialNumber(key []byte) ([]byte, error) {
 	return encryptAes(key, c.serialNumber, c.nonce)
 }
 
-func (c *Container) EncryptPersonalIdentifier(key []byte) ([]byte, error) {
+func (c *Container) EncryptIdentifier(key []byte) ([]byte, error) {
 	return encryptAes(key, c.identifier, c.nonce)
 }
 
@@ -563,49 +501,56 @@ func (c *Container) EncryptSignature(key []byte) ([]byte, error) {
 // DecryptEverything is the obvious counterpart to EncryptEverything. It performs the decryption in place, using,
 // depending on key length, either AES-128, AES-192 or AES-256.
 func (c *Container) DecryptEverything(key []byte) error {
-	var (
-		b []byte
-		err error
-	)
-	if b, err = c.DecryptSerialNumber(key); err != nil {
+	sn, err := c.DecryptSerialNumber(key)
+	if err != nil {
 		return err
 	}
-	c.serialNumber = b
 
-	if b, err = c.DecryptPersonalIdentifier(key); err != nil {
+	id, err := c.DecryptIdentifier(key)
+	if err != nil {
 		return err
 	}
-	c.identifier = b
 
-	if b, err = c.DecryptCertificate(key); err != nil {
+	cert, err := c.DecryptCertificate(key)
+	if err != nil {
 		return err
 	}
-	c.certificate = b
 
-	if b, err = c.DecryptPrivateKey(key); err != nil {
+	pk, err := c.DecryptPrivateKey(key)
+	if err != nil {
 		return err
 	}
-	c.privateKey = b
 
-	if b, err = c.DecryptEmail(key); err != nil {
-		return err
-	}
-	c.email = b
 
-	if b, err = c.DecryptUsername(key); err != nil {
+	email, err := c.DecryptEmail(key)
+	if err != nil {
 		return err
 	}
-	c.username = b
 
-	if b, err = c.DecryptToken(key); err != nil {
+	username, err := c.DecryptUsername(key)
+	if err != nil {
 		return err
 	}
-	c.token = b
 
-	if b, err = c.DecryptSignature(key); err != nil {
+	token, err := c.DecryptToken(key)
+	if err != nil {
 		return err
 	}
-	c.signature = b
+
+	sig, err := c.DecryptSignature(key)
+	if err != nil {
+		return err
+	}
+
+	// everything or nothing
+	c.serialNumber = sn
+	c.identifier = id
+	c.certificate = cert
+	c.privateKey = pk
+	c.email = email
+	c.username = username
+	c.token = token
+	c.signature = sig
 
 	return nil
 }
@@ -614,7 +559,7 @@ func (c *Container) DecryptSerialNumber(key []byte) ([]byte, error) {
 	return decryptAes(key, c.serialNumber, c.nonce)
 }
 
-func (c *Container) DecryptPersonalIdentifier(key []byte) ([]byte, error) {
+func (c *Container) DecryptIdentifier(key []byte) ([]byte, error) {
 	return decryptAes(key, c.identifier, c.nonce)
 }
 
@@ -640,6 +585,82 @@ func (c *Container) DecryptToken(key []byte) ([]byte, error) {
 
 func (c *Container) DecryptSignature(key []byte) ([]byte, error) {
 	return decryptAes(key, c.signature, c.nonce)
+}
+
+func (c *Container) CalculateHeaders() {
+	header := headerBlock[:]
+
+	var (
+		versionLength     = uint16(3)
+		nonceLength       = uint16(len(c.nonce))
+		tagLength         = uint16(len(c.tag))
+		snLength          = uint16(len(c.serialNumber))
+		piLength          = uint16(len(c.identifier))
+		certificateLength = uint16(len(c.certificate))
+		privKeyLength     = uint16(len(c.privateKey))
+		emailLength       = uint16(len(c.email))
+		usernameLength    = uint16(len(c.username))
+		tokenLength       = uint16(len(c.token))
+		signatureLength   = uint16(len(c.signature))
+	)
+
+	var offset uint16 = 0 //uint16(headerSize)
+
+	// version
+	// no need to set any values
+	offset += versionLength
+
+	// nonce
+	binary.BigEndian.PutUint16(header[2:4], offset)
+	binary.BigEndian.PutUint16(header[4:6], nonceLength)
+	offset += nonceLength
+
+	// tag
+	binary.BigEndian.PutUint16(header[6:8], offset)
+	binary.BigEndian.PutUint16(header[8:10], tagLength)
+	offset += tagLength
+
+	// serial number
+	binary.BigEndian.PutUint16(header[10:12], offset)
+	binary.BigEndian.PutUint16(header[12:14], snLength)
+	offset += snLength
+
+	// personal identifier
+	binary.BigEndian.PutUint16(header[14:16], offset)
+	binary.BigEndian.PutUint16(header[16:18], piLength)
+	offset += piLength
+
+	// certificate
+	binary.BigEndian.PutUint16(header[18:20], offset)
+	binary.BigEndian.PutUint16(header[20:22], certificateLength)
+	offset += certificateLength
+
+	// private key
+	binary.BigEndian.PutUint16(header[22:24], offset)
+	binary.BigEndian.PutUint16(header[24:26], privKeyLength)
+	offset += privKeyLength
+
+	// email
+	binary.BigEndian.PutUint16(header[26:28], offset)
+	binary.BigEndian.PutUint16(header[28:30], emailLength)
+	offset += emailLength
+
+	// username
+	binary.BigEndian.PutUint16(header[30:32], offset)
+	binary.BigEndian.PutUint16(header[32:34], usernameLength)
+	offset += usernameLength
+
+	// token
+	binary.BigEndian.PutUint16(header[34:36], offset)
+	binary.BigEndian.PutUint16(header[36:38], tokenLength)
+	offset += tokenLength
+
+	// signature
+	binary.BigEndian.PutUint16(header[38:40], offset)
+	binary.BigEndian.PutUint16(header[40:], signatureLength) // leave upper bound open
+	//offset += signatureLength // no need to increase this further
+
+	copy(c.headers[:], header)
 }
 
 func encryptAes(key, s, nonce []byte) ([]byte, error) {

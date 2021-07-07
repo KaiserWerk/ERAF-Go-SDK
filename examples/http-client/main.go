@@ -1,0 +1,41 @@
+package main
+
+import (
+	"bytes"
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+
+	eraf "github.com/KaiserWerk/ERAF-Go-SDK"
+)
+
+var (
+	aesKey = []byte("3d9p8MV0eFe2JeXe6YnD8RNjQ4GdbtNS")
+)
+
+func main() {
+	container := eraf.New()
+
+	container.SetEmail([]byte("my@cool-domain.com"))
+	container.SetUsername([]byte("cool-user"))
+
+	err := container.EncryptEverything(aesKey)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	cl := &http.Client{Timeout: 5 * time.Second}
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:9000/accept", bytes.NewBuffer(container.MarshalBytes()))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	resp, err := cl.Do(req)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	fmt.Println("Status:", resp.StatusCode)
+}
+

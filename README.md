@@ -229,6 +229,8 @@ Otherwise, use ``err := container.DecryptEverything(key)`` to simply decrypt eve
 
 1. [Simple example with encryption](examples/simple-encryption/main.go)
 1. [Extended example with encryption and (un)marshalling](examples/extended-encryption-and-marshalling/main.go)
+1. [Sending an encrypted ERAF container via HTTP](examples/http-client/main.go) and
+   [Receiving an ERAF container via HTTP and decrypt it](examples/http-server/main.go)
 
 ## Tests
 

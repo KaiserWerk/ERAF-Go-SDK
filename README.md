@@ -1,5 +1,7 @@
 # ERAF Go SDK
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/KaiserWerk/ERAF-Go-SDK)](https://goreportcard.com/report/github.com/KaiserWerk/ERAF-Go-SDK)
+
 This is an SDK to read, edit and create *Entity-related Authentication Format* files, *entity* meaning
 a person, a device, an app, an endpoint or whatever it is you want to authenticate.
 

@@ -125,10 +125,10 @@ func TestContainer_Read(t *testing.T) {
 		want      int
 		wantErr   bool
 	}{
-		{name: "empty", container: New(), args: args{s: []byte{}}, want: 45, wantErr: false},
+		{name: "empty", container: New(), args: args{s: []byte{}}, want: int(headerSize) + 3, wantErr: false}, // headerSize + version bytes
 		{name: "with email", container: func() *Container {
 			return New().SetEmail([]byte("my@cool-domain.com"))
-		}(), args: args{s: []byte{}}, want: 63, wantErr: false},
+		}(), args: args{s: []byte{}}, want: 67, wantErr: false},  // headerSize + version bytes + email
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

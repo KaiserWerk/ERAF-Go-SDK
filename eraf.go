@@ -160,7 +160,7 @@ func (c *Container) GetCertificate() []byte {
 	return c.certificate
 }
 
-// SetCertificate sets a certificate
+// SetCertificate sets a certificate. For the convenience functions to work properly, it expected to be in PEM format
 func (c *Container) SetCertificate(cert []byte) *Container {
 	if len(cert) <= blockMaxSize {
 		c.certificate = cert
@@ -176,7 +176,7 @@ func (c *Container) GetPrivateKey() []byte {
 	return c.privateKey
 }
 
-// SetPrivateKey sets a private key
+// SetPrivateKey sets a private key. For the convenience functions to work properly, it expected to be in PEM format
 func (c *Container) SetPrivateKey(pk []byte) *Container {
 	if len(pk) <= blockMaxSize {
 		c.privateKey = pk

@@ -147,7 +147,7 @@ Get some byte amount information:
 // Total length
 totalLen := container.Len()
 
-// header length (currently constant 42 bytes)
+// header length (constant)
 headerLen := container.HeaderLen()
 
 // payload length

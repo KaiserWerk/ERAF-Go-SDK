@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"net/http"
@@ -26,7 +25,7 @@ func main() {
 	}
 
 	cl := &http.Client{Timeout: 5 * time.Second}
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:9000/accept", bytes.NewBuffer(container.MarshalBytes()))
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:9000/accept", container)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

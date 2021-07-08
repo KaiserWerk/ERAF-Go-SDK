@@ -122,7 +122,7 @@ err := eraf.Unmarshal(resp.Body, &container)
 
 // or directly from a file
 container := &eraf.Container{}
-err := eraf.UnmarshalFromFile("somefile.eraf", &container) // again, the extension doesn't matter
+err := eraf.UnmarshalFromFile("somefile.eraf", container) // again, the extension doesn't matter
 
 // or from a []byte
 container := &eraf.Container{}

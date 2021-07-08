@@ -322,8 +322,11 @@ func (c *Container) PayloadLen() int {
 
 // Read reads all bytes into s and returns the number of bytes read as well as an error
 func (c *Container) Read(s []byte) (int, error) {
-	copy(s, c.MarshalBytes())
-	return c.Len(), nil
+	n := copy(s, c.MarshalBytes())
+	if n == 0 {
+		return 0, io.EOF
+	}
+	return n, nil
 }
 
 // Headers returns just the header array of the ERAF file

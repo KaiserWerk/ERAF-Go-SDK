@@ -118,7 +118,7 @@ You can either read an *ERAF* container from an ``io.Reader``, directly from a f
 resp, _ := http.Do(req)
 defer resp.Body.Close()
 container := &eraf.Container{}
-err := eraf.Unmarshal(resp.Body, &container)
+err := eraf.Unmarshal(resp.Body, container)
 
 // or directly from a file
 container := &eraf.Container{}
@@ -134,7 +134,7 @@ body parameter for HTTP requests which will read the whole container into the re
 
 ```golang
 container := &eraf.Container{}
-// Set ...
+// set some fields
 req, err := http.NewRequest(http.MethodPost, "https://some-url.com/", container) // currently broken
 ```
 

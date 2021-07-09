@@ -499,6 +499,8 @@ func UnmarshalBytes(allBytes []byte, target *Container) error {
 	rootCertBytes := payload[rootCertPosition : rootCertPosition+rootCertLength]
 	target.rootCertificate = rootCertBytes
 
+	target.CalculateHeaders()
+
 	return nil
 }
 

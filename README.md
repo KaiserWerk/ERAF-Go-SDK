@@ -129,14 +129,13 @@ container := &eraf.Container{}
 err := eraf.UnmarshalBytes(somebytes, container)
 ```
 
-The *ERAF* container implements the ``io.Reader`` interface, so you can supply it as the 
+The *ERAF* container implements the ``io.Reader`` interface, so you can (for example) supply it as the 
 body parameter for HTTP requests which will read the whole container into the request body:
 
 ```golang
-container := &eraf.Container{
-	// ...
-}
-req, err := http.NewRequest(http.MethodPost, "https://some-url.com/", container)
+container := &eraf.Container{}
+// Set ...
+req, err := http.NewRequest(http.MethodPost, "https://some-url.com/", container) // currently broken
 ```
 
 ### Obtaining Information
@@ -189,9 +188,8 @@ A basic assumption is that all certificate and private key data set is PEM-encod
 For easier certificate handling, there are a few convenience functions:
 
 ```golang
-c := &eraf.Container{
-	// some fields
-}
+c := &eraf.Container{}
+// set some fields
 
 // obtain the certificate bytes as *x509.Certificate
 x509Cert, err := c.GetX509Certificate()

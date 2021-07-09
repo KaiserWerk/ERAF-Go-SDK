@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/binary"
+	"encoding/pem"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -280,7 +281,11 @@ func (c *Container) GetX509Certificate() (*x509.Certificate, error) {
 	if c.certificate == nil {
 		return nil, fmt.Errorf("certificate is nil")
 	}
-	return x509.ParseCertificate(c.certificate)
+	block, _ := pem.Decode(c.certificate)
+	if block == nil {
+		return nil, fmt.Errorf("PEM block is nil")
+	}
+	return x509.ParseCertificate(block.Bytes)
 }
 
 // GetTlsCertificate returns the certificate as *tls.Certificate
@@ -301,7 +306,11 @@ func (c *Container) GetX509RootCertificate() (*x509.Certificate, error) {
 	if c.rootCertificate == nil {
 		return nil, fmt.Errorf("root certificate is nil")
 	}
-	return x509.ParseCertificate(c.rootCertificate)
+	block, _ := pem.Decode(c.rootCertificate)
+	if block == nil {
+		return nil, fmt.Errorf("PEM block is nil")
+	}
+	return x509.ParseCertificate(block.Bytes)
 }
 
 // Len returns the total amount of bytes of the file

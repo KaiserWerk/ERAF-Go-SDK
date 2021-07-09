@@ -20,7 +20,7 @@ func TestContainer_New(t *testing.T) {
 
 func TestContainer_GetVersionMajor(t *testing.T) {
 	var (
-		c = New()
+		c             = New()
 		expected byte = 150
 	)
 	c.SetVersionMajor(expected)
@@ -32,7 +32,7 @@ func TestContainer_GetVersionMajor(t *testing.T) {
 
 func TestContainer_SetVersionMajor(t *testing.T) {
 	var (
-		c = New()
+		c             = New()
 		expected byte = 150
 	)
 	c.SetVersionMajor(expected)
@@ -44,7 +44,7 @@ func TestContainer_SetVersionMajor(t *testing.T) {
 
 func TestContainer_GetVersionMinor(t *testing.T) {
 	var (
-		c = New()
+		c             = New()
 		expected byte = 17
 	)
 	c.SetVersionMinor(expected)
@@ -56,7 +56,7 @@ func TestContainer_GetVersionMinor(t *testing.T) {
 
 func TestContainer_SetVersionMinor(t *testing.T) {
 	var (
-		c = New()
+		c             = New()
 		expected byte = 17
 	)
 	c.SetVersionMinor(expected)
@@ -68,7 +68,7 @@ func TestContainer_SetVersionMinor(t *testing.T) {
 
 func TestContainer_GetVersionPatch(t *testing.T) {
 	var (
-		c = New()
+		c             = New()
 		expected byte = 4
 	)
 	c.SetVersionPatch(expected)
@@ -80,7 +80,7 @@ func TestContainer_GetVersionPatch(t *testing.T) {
 
 func TestContainer_SetVersionPatch(t *testing.T) {
 	var (
-		c = New()
+		c             = New()
 		expected byte = 4
 	)
 	c.SetVersionPatch(expected)
@@ -93,7 +93,7 @@ func TestContainer_SetVersionPatch(t *testing.T) {
 func TestContainer_GetNonce(t *testing.T) {
 	var (
 		expected = []byte{1, 2, 3, 4, 5}
-		c = New().SetNonce(expected)
+		c        = New().SetNonce(expected)
 	)
 
 	if !bytes.Equal(c.GetNonce(), expected) {
@@ -104,7 +104,7 @@ func TestContainer_GetNonce(t *testing.T) {
 func TestContainer_SetNonce(t *testing.T) {
 	var (
 		expected = []byte{1, 2, 3, 4, 5}
-		c = New().SetNonce(expected)
+		c        = New().SetNonce(expected)
 	)
 
 	if !bytes.Equal(c.GetNonce(), expected) {
@@ -115,7 +115,7 @@ func TestContainer_SetNonce(t *testing.T) {
 func TestContainer_GetTag(t *testing.T) {
 	var (
 		expected = []byte{6, 7, 8, 9, 10}
-		c = New().SetTag(expected)
+		c        = New().SetTag(expected)
 	)
 
 	if !bytes.Equal(c.GetTag(), expected) {
@@ -126,7 +126,7 @@ func TestContainer_GetTag(t *testing.T) {
 func TestContainer_SetTag(t *testing.T) {
 	var (
 		expected = []byte{6, 7, 8, 9, 10}
-		c = New().SetTag(expected)
+		c        = New().SetTag(expected)
 	)
 
 	if !bytes.Equal(c.GetTag(), expected) {
@@ -137,7 +137,7 @@ func TestContainer_SetTag(t *testing.T) {
 func TestContainer_GetIdentifier(t *testing.T) {
 	var (
 		expected = []byte{75, 180, 50, 1}
-		c = New().SetIdentifier(expected)
+		c        = New().SetIdentifier(expected)
 	)
 
 	if !bytes.Equal(c.GetIdentifier(), expected) {
@@ -148,16 +148,13 @@ func TestContainer_GetIdentifier(t *testing.T) {
 func TestContainer_SetIdentifier(t *testing.T) {
 	var (
 		expected = []byte{75, 180, 50, 1}
-		c = New().SetIdentifier(expected)
+		c        = New().SetIdentifier(expected)
 	)
 
 	if !bytes.Equal(c.GetIdentifier(), expected) {
 		t.Errorf("Expected identifier %#v, got %#v", expected, c.GetIdentifier())
 	}
 }
-
-
-
 
 func TestContainer_Payload(t *testing.T) {
 
@@ -337,4 +334,3 @@ func BenchmarkMarshalToFile(b *testing.B) {
 		}
 	}
 }
-

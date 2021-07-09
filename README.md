@@ -101,8 +101,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	err := container.Marshal(w)
 }
 
-// or into a file
-err := container.MarshalToFile("somefile.eraf") // the file extension does not matter, actually
+// or into a file, given the file permissions
+err := container.MarshalToFile("somefile.eraf", 0744) // the file extension does not matter, actually
 
 
 // or just get a []byte

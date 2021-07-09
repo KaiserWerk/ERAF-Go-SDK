@@ -840,3 +840,20 @@ func decryptAes(key, s, nonce []byte) ([]byte, error) {
 
 	return b, nil
 }
+
+func (c *Container) Dump(w io.Writer) {
+	if w == nil {
+		return
+	}
+
+	fmt.Fprintf(w, "Semantic Version: %s\n", c.GetSemVer())
+	fmt.Fprintf(w, "Serial number: %s\n", c.GetSerialNumber())
+	fmt.Fprintf(w, "Identifier: %s\n", c.GetIdentifier())
+	fmt.Fprintf(w, "Certificate: %s\n", c.GetCertificate())
+	fmt.Fprintf(w, "Private Key: %s\n", c.GetPrivateKey())
+	fmt.Fprintf(w, "Email: %s\n", c.GetEmail())
+	fmt.Fprintf(w, "Username: %s\n", c.GetUsername())
+	fmt.Fprintf(w, "Token: %s\n", c.GetToken())
+	fmt.Fprintf(w, "Signature: %s\n", c.GetSignature())
+	fmt.Fprintf(w, "Root Certificate: %s\n", c.GetRootCertificate())
+}

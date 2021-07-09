@@ -348,13 +348,15 @@ func (c *Container) Payload() []byte {
 	return append(b, c.signature...)
 }
 
-// MarshalToFile serializes the ERAF file into the given file
-func (c *Container) MarshalToFile(file string) error {
-	fh, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0744)
+// MarshalToFile serializes the ERAF file into the given file using the given file permissions
+func (c *Container) MarshalToFile(file string, perms os.FileMode) error {
+	fh, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perms)
 	if err != nil {
 		return err
 	}
-	defer fh.Close()
+	defer func() {
+		_ = fh.Close()
+	}()
 
 	return c.Marshal(fh)
 }
@@ -393,7 +395,9 @@ func UnmarshalFromFile(file string, target *Container) error {
 	if err != nil {
 		return err
 	}
-	defer reader.Close()
+	defer func() {
+		_ = reader.Close()
+	}()
 
 	return Unmarshal(reader, target)
 }
@@ -406,7 +410,7 @@ func Unmarshal(r io.Reader, target *Container) error {
 	}
 
 	if len(allBytes) == 0 {
-		return fmt.Errorf("reader gave 0 bytes")
+		return fmt.Errorf("read 0 bytes")
 	}
 
 	return UnmarshalBytes(allBytes, target)
@@ -485,9 +489,15 @@ func UnmarshalBytes(allBytes []byte, target *Container) error {
 
 	// signature
 	signaturePosition := binary.BigEndian.Uint16(headers[38:40])
-	signatureLength := binary.BigEndian.Uint16(headers[40:])
+	signatureLength := binary.BigEndian.Uint16(headers[40:42])
 	signatureBytes := payload[signaturePosition : signaturePosition+signatureLength]
 	target.signature = signatureBytes
+
+	// root certificate
+	rootCertPosition := binary.BigEndian.Uint16(headers[42:44])
+	rootCertLength := binary.BigEndian.Uint16(headers[44:])
+	rootCertBytes := payload[rootCertPosition : rootCertPosition+rootCertLength]
+	target.rootCertificate = rootCertBytes
 
 	return nil
 }
@@ -543,6 +553,11 @@ func (c *Container) EncryptEverything(key []byte) error {
 		return err
 	}
 
+	rootCert, err := c.EncryptRootCertificate(key)
+	if err != nil {
+		return err
+	}
+
 	// everything or nothing
 	// set the values only if no error occurs
 	c.serialNumber = sn
@@ -553,6 +568,9 @@ func (c *Container) EncryptEverything(key []byte) error {
 	c.username = username
 	c.token = token
 	c.signature = sig
+	c.rootCertificate = rootCert
+
+	c.CalculateHeaders()
 
 	return nil
 }
@@ -645,6 +663,11 @@ func (c *Container) DecryptEverything(key []byte) error {
 		return err
 	}
 
+	rootCert, err := c.DecryptRootCertificate(key)
+	if err != nil {
+		return err
+	}
+
 	// everything or nothing
 	c.serialNumber = sn
 	c.identifier = id
@@ -654,6 +677,9 @@ func (c *Container) DecryptEverything(key []byte) error {
 	c.username = username
 	c.token = token
 	c.signature = sig
+	c.rootCertificate = rootCert
+
+	c.CalculateHeaders()
 
 	return nil
 }
@@ -714,11 +740,12 @@ func (c *Container) CalculateHeaders() {
 		snLength          = uint16(len(c.serialNumber))
 		piLength          = uint16(len(c.identifier))
 		certificateLength = uint16(len(c.certificate))
-		privKeyLength     = uint16(len(c.privateKey))
+		privateKeyLength  = uint16(len(c.privateKey))
 		emailLength       = uint16(len(c.email))
 		usernameLength    = uint16(len(c.username))
 		tokenLength       = uint16(len(c.token))
 		signatureLength   = uint16(len(c.signature))
+		rootCertLength    = uint16(len(c.rootCertificate))
 	)
 
 	var offset uint16 = 0 //uint16(headerSize)
@@ -754,8 +781,8 @@ func (c *Container) CalculateHeaders() {
 
 	// private key
 	binary.BigEndian.PutUint16(header[22:24], offset)
-	binary.BigEndian.PutUint16(header[24:26], privKeyLength)
-	offset += privKeyLength
+	binary.BigEndian.PutUint16(header[24:26], privateKeyLength)
+	offset += privateKeyLength
 
 	// email
 	binary.BigEndian.PutUint16(header[26:28], offset)
@@ -774,10 +801,33 @@ func (c *Container) CalculateHeaders() {
 
 	// signature
 	binary.BigEndian.PutUint16(header[38:40], offset)
-	binary.BigEndian.PutUint16(header[40:], signatureLength) // leave upper bound open
-	//offset += signatureLength // no need to increase this further
+	binary.BigEndian.PutUint16(header[40:42], signatureLength)
+	offset += signatureLength
+
+	// root certificate
+	binary.BigEndian.PutUint16(header[42:44], offset)
+	binary.BigEndian.PutUint16(header[44:], rootCertLength) // leave upper bound open
+	//offset += rootCertLength // no need to increase this further
 
 	copy(c.headers[:], header)
+}
+
+// Dump just writes all field contents into an io.Writer
+func (c *Container) Dump(w io.Writer) {
+	if w == nil {
+		return
+	}
+
+	_, _ = fmt.Fprintf(w, "Semantic Version: %s\n", c.GetSemVer())
+	_, _ = fmt.Fprintf(w, "Serial number: %s\n", c.GetSerialNumber())
+	_, _ = fmt.Fprintf(w, "Identifier: %s\n", c.GetIdentifier())
+	_, _ = fmt.Fprintf(w, "Certificate: %s\n", c.GetCertificate())
+	_, _ = fmt.Fprintf(w, "Private Key: %s\n", c.GetPrivateKey())
+	_, _ = fmt.Fprintf(w, "Email: %s\n", c.GetEmail())
+	_, _ = fmt.Fprintf(w, "Username: %s\n", c.GetUsername())
+	_, _ = fmt.Fprintf(w, "Token: %s\n", c.GetToken())
+	_, _ = fmt.Fprintf(w, "Signature: %s\n", c.GetSignature())
+	_, _ = fmt.Fprintf(w, "Root Certificate: %s\n", c.GetRootCertificate())
 }
 
 func encryptAes(key, s, nonce []byte) ([]byte, error) {
@@ -839,21 +889,4 @@ func decryptAes(key, s, nonce []byte) ([]byte, error) {
 	}
 
 	return b, nil
-}
-
-func (c *Container) Dump(w io.Writer) {
-	if w == nil {
-		return
-	}
-
-	fmt.Fprintf(w, "Semantic Version: %s\n", c.GetSemVer())
-	fmt.Fprintf(w, "Serial number: %s\n", c.GetSerialNumber())
-	fmt.Fprintf(w, "Identifier: %s\n", c.GetIdentifier())
-	fmt.Fprintf(w, "Certificate: %s\n", c.GetCertificate())
-	fmt.Fprintf(w, "Private Key: %s\n", c.GetPrivateKey())
-	fmt.Fprintf(w, "Email: %s\n", c.GetEmail())
-	fmt.Fprintf(w, "Username: %s\n", c.GetUsername())
-	fmt.Fprintf(w, "Token: %s\n", c.GetToken())
-	fmt.Fprintf(w, "Signature: %s\n", c.GetSignature())
-	fmt.Fprintf(w, "Root Certificate: %s\n", c.GetRootCertificate())
 }

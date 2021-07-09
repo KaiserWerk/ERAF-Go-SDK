@@ -586,6 +586,75 @@ UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
 	}
 }
 
+func TestContainer_Len(t *testing.T) {
+	tests := []struct {
+		name   string
+		container *Container
+		want   int
+	}{
+		{name: "empty", container: New(), want: 49},
+		{name: "with username", container: func() *Container {
+			return New().SetUsername([]byte("mycoolusername"))
+		}(), want: 63},
+		{name: "with username and nonce", container: func() *Container {
+			return New().SetUsername([]byte("mycoolusername")).SetNonce([]byte{1,2,3,4,5,6,7,8,9})
+		}(), want: 72},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.container.Len(); got != tt.want {
+				t.Errorf("Len() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestContainer_HeaderLen(t *testing.T) {
+	var (
+		expected = int(headerSize) + 3
+		c = New()
+	)
+
+	if c.HeaderLen() != expected {
+		t.Errorf("expected header length %d, got %d", expected, c.HeaderLen())
+	}
+}
+
+func TestContainer_PayloadLen(t *testing.T) {
+	tests := []struct {
+		name      string
+		container *Container
+		want      int
+	}{
+		{name: "empty", container: New(), want: 3},
+		{name: "with personal identifier", container: func() *Container {
+			return New().SetIdentifier([]byte{1, 3, 5, 7, 9})
+		}(), want: 8},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.container.PayloadLen(); got != tt.want {
+				t.Errorf("PayloadLen() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestContainer_Headers(t *testing.T) {
+	var (
+		c = New()
+		headers = c.Headers()
+	)
+
+	if len(c.Headers()) != int(headerSize) {
+		t.Fatal("wrong header block size")
+	}
+
+	if !bytes.Equal(headers[:], headerBlock[:]) {
+		t.Errorf("expected default headers, got %#v instead", headers)
+	}
+}
+
 func TestContainer_Payload(t *testing.T) {
 
 	tests := []struct {
@@ -612,12 +681,7 @@ func TestContainer_Payload(t *testing.T) {
 	}
 }
 
-func TestContainer_Headers(t *testing.T) {
-	c := New()
-	if len(c.Headers()) != int(headerSize) {
-		t.Fatal("wrong header block size")
-	}
-}
+
 
 //func TestContainer_Read(t *testing.T) {
 //	type args struct {
@@ -650,42 +714,13 @@ func TestContainer_Headers(t *testing.T) {
 //	}
 //}
 
-func TestContainer_PayloadLen(t *testing.T) {
-	tests := []struct {
-		name      string
-		container *Container
-		want      int
-	}{
-		{name: "empty", container: New(), want: 3},
-		{name: "with personal identifier", container: func() *Container {
-			return New().SetIdentifier([]byte{1, 3, 5, 7, 9})
-		}(), want: 8},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.container.PayloadLen(); got != tt.want {
-				t.Errorf("PayloadLen() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
-func TestContainer_HeaderLen(t *testing.T) {
-	tests := []struct {
-		name      string
-		container *Container
-		want      int
-	}{
-		{name: "normal", container: New(), want: int(headerSize)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.container.HeaderLen(); got != tt.want {
-				t.Errorf("HeaderLen() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+
+
+/**
+ Benchmark tests
+ */
+
 
 func BenchmarkUnmarshalFromFile(b *testing.B) {
 	const filename = "__bench_unmarshal_from_file.eraf"

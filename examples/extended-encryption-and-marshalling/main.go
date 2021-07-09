@@ -63,7 +63,7 @@ func main() {
 	fmt.Println("Identifier:", container.GetIdentifier())
 	fmt.Println("Email:", string(container.GetEmail()))
 
-	err = container.MarshalToFile("test.eraf")
+	err = container.MarshalToFile("test.eraf", 0700)
 	if err != nil {
 		fmt.Println("MarshalToFile error:", err.Error())
 	}
@@ -143,7 +143,7 @@ func createDummyEraf() {
 		log.Fatal(err.Error())
 	}
 
-	err = container.MarshalToFile("good.eraf")
+	err = container.MarshalToFile("good.eraf", 0700)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

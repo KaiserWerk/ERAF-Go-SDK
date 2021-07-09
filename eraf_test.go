@@ -2,6 +2,7 @@ package era
 
 import (
 	"bytes"
+	"crypto/rand"
 	"io"
 	"os"
 	"reflect"
@@ -108,7 +109,7 @@ func TestContainer_SetNonce(t *testing.T) {
 	)
 
 	if !bytes.Equal(c.GetNonce(), expected) {
-		t.Errorf("Expected %#v, got %#v", expected, c.GetNonce())
+		t.Errorf("Expected nonce %#v, got %#v", expected, c.GetNonce())
 	}
 }
 
@@ -153,6 +154,435 @@ func TestContainer_SetIdentifier(t *testing.T) {
 
 	if !bytes.Equal(c.GetIdentifier(), expected) {
 		t.Errorf("Expected identifier %#v, got %#v", expected, c.GetIdentifier())
+	}
+}
+
+func TestContainer_GetCertificate(t *testing.T) {
+	var (
+		expected = []byte(`-----BEGIN CERTIFICATE-----
+MIICwzCCAaugAwIBAgIJAOUotzKKlJNFMA0GCSqGSIb3DQEBBQUAMBQxEjAQBgNV
+BAMTCWxvY2FsaG9zdDAeFw0yMTA2MDExOTU2MDRaFw0zMTA1MzAxOTU2MDRaMBQx
+EjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAMbzgJxe5wQpTJu3ph5ROgI4JLVHoU/GTZDQ4PxRUnKoG/S/5zuRLkS1v8BN
+wo5ETId6THaPpWxQsbU4XrynC7R6/pNVHHqoQl6tDr5Zzo9/fgAHerCYDwJ7wNsv
+rLTBc9ibjsZXVKdzr3UIAs6Y9maDEQDsFYiVvT4iBnw90p7zlSd+Y1KPBj/abwWV
+HK8tz1tkrsSVtAipkIE48H5xrWSn6zfEX959ibUb9MEG8kxoYCRtsUTrfe2HYCv/
+3WfyCOJ1FlWeW1Zs7D5hM1OUNMnTjrQq6CNsCVS/9KLUNAyhM8XVRv1eZe9RXDqW
+y0n0hYnB+5J/ijqMz3khvpbcknkCAwEAAaMYMBYwFAYDVR0RBA0wC4IJbG9jYWxo
+b3N0MA0GCSqGSIb3DQEBBQUAA4IBAQBagAOvZKRBj8T+4DX9NbzRNRjbXQg0taEg
+ybYKnbh6KOQd6hpk1oQ8nG1xj0qWJgCr48Qthg1mZyF4wroi0p3b/QBmZnqjweel
+Ykfb7Qzu6cI1qR5GPveYeIc9JXnNB8flw95+d4B5ozYzruwSglTBnPqo44Imhc5N
+NrahdQNtYIdQAinMb5SEvXrz1SsAqkHmWcIxHnKFiHkNJ6q/EjtVEwXI/AiFaygv
+k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
+UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
+-----END CERTIFICATE-----
+`)
+		c        = New().SetCertificate(expected)
+	)
+
+	if !bytes.Equal(c.GetCertificate(), expected) {
+		t.Errorf("Expected certificate %s, got %s", expected, c.GetCertificate())
+	}
+}
+
+func TestContainer_SetCertificate(t *testing.T) {
+	var (
+		expected = []byte(`-----BEGIN CERTIFICATE-----
+MIICwzCCAaugAwIBAgIJAOUotzKKlJNFMA0GCSqGSIb3DQEBBQUAMBQxEjAQBgNV
+BAMTCWxvY2FsaG9zdDAeFw0yMTA2MDExOTU2MDRaFw0zMTA1MzAxOTU2MDRaMBQx
+EjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAMbzgJxe5wQpTJu3ph5ROgI4JLVHoU/GTZDQ4PxRUnKoG/S/5zuRLkS1v8BN
+wo5ETId6THaPpWxQsbU4XrynC7R6/pNVHHqoQl6tDr5Zzo9/fgAHerCYDwJ7wNsv
+rLTBc9ibjsZXVKdzr3UIAs6Y9maDEQDsFYiVvT4iBnw90p7zlSd+Y1KPBj/abwWV
+HK8tz1tkrsSVtAipkIE48H5xrWSn6zfEX959ibUb9MEG8kxoYCRtsUTrfe2HYCv/
+3WfyCOJ1FlWeW1Zs7D5hM1OUNMnTjrQq6CNsCVS/9KLUNAyhM8XVRv1eZe9RXDqW
+y0n0hYnB+5J/ijqMz3khvpbcknkCAwEAAaMYMBYwFAYDVR0RBA0wC4IJbG9jYWxo
+b3N0MA0GCSqGSIb3DQEBBQUAA4IBAQBagAOvZKRBj8T+4DX9NbzRNRjbXQg0taEg
+ybYKnbh6KOQd6hpk1oQ8nG1xj0qWJgCr48Qthg1mZyF4wroi0p3b/QBmZnqjweel
+Ykfb7Qzu6cI1qR5GPveYeIc9JXnNB8flw95+d4B5ozYzruwSglTBnPqo44Imhc5N
+NrahdQNtYIdQAinMb5SEvXrz1SsAqkHmWcIxHnKFiHkNJ6q/EjtVEwXI/AiFaygv
+k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
+UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
+-----END CERTIFICATE-----
+`)
+		c        = New().SetCertificate(expected)
+	)
+
+	if !bytes.Equal(c.GetCertificate(), expected) {
+		t.Errorf("Expected certificate %s, got %s", expected, c.GetCertificate())
+	}
+}
+
+func TestContainer_GetPrivateKey(t *testing.T) {
+	var (
+		expected = []byte(`-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAxvOAnF7nBClMm7emHlE6AjgktUehT8ZNkNDg/FFScqgb9L/n
+O5EuRLW/wE3CjkRMh3pMdo+lbFCxtThevKcLtHr+k1UceqhCXq0OvlnOj39+AAd6
+sJgPAnvA2y+stMFz2JuOxldUp3OvdQgCzpj2ZoMRAOwViJW9PiIGfD3SnvOVJ35j
+Uo8GP9pvBZUcry3PW2SuxJW0CKmQgTjwfnGtZKfrN8Rf3n2JtRv0wQbyTGhgJG2x
+ROt97YdgK//dZ/II4nUWVZ5bVmzsPmEzU5Q0ydOOtCroI2wJVL/0otQ0DKEzxdVG
+/V5l71FcOpbLSfSFicH7kn+KOozPeSG+ltySeQIDAQABAoIBAQCw2rEPUEWoK1ZQ
+blabSLV6V5I6G6zID43QF/6IDXpvNgVz8kuJZittJOuJ9RXoBcrJ++uQ0WzJ9omi
+gLOmnBAJpfQ74ELqvjwRkWEz0P2QDlNhj0R/Swy8tmnf7mdmXzmt6cpngiZcnLfy
+Hubv5IXU5tnsqfESc5nAa9q8AvECHhBYhgXRgJK9gfqNReWZHWxTg2P2Df1hHd3m
+F1GTUmqvvzeuHdBRoTsaQpfClgw5bRgSOECR46kanXb1TXsnTYU2Ym9WNPL0hlQj
+2rKrukTVOdaBk6231kXNI4siS4DOwhfUXRGt8Yh4v3e4Hn6eZpqc7IcSH3gQ+QUa
+v18iE1uJAoGBAOz3SFib99hJHpvfFsBb6F4iQFSOLhQ5ZdX0ONj6Bw6HK/K2fwmI
+PFS8YYmaSif6o14r3wIz1tCLPdlkZ39wgrTv0ALpcoWjQTAQPdkupdcwAHNE3Q7g
+L16GoAtRKpiNj24mmItjvWy+J0fkDiqZGRrv9+whR9Tz7+3CcfskhyLTAoGBANbu
+hje/YJfY4oLw6r7Lv4sTKM063pr4maP7bCOZPsiVW4awKODR1OlyDf89s+AOQCU9
+/mrSzfOwz1VJzbYRVyPFDTrBy9d8e7La1krVNOHMssIF8mPS+0qMIn54HkCRyPKr
+ecTJ1k8W7BVXe18UsGIstdaIrjYYeizz8vX3He4DAoGARvWRw38JC8pxkQmP/ZBI
+GBA3pVpiMAo0FYqpj0fn3xDZNzgw+IDEWDeFGbiLJkemrieDA1zUoeRgY/3uBDqD
+2XzKlGSlt6D4f1UNwEB4xuSH7fycGb1GUg8MU/c9Qyt43OpP2cXHTo3uo1eGanko
+DGn5mssogHt/yHnmuebpVKMCgYAqzSdHVMIsmxFImCd3RWXokTEv5YhM/jLCeCAp
+2qupEC1A3jXVx5OJxZ/J84StmsjlYboXldFTtSMkzeS8XCmpQuWGjO9GA1Ey5eeE
+0X6NdNEoWDzT6kEGsG9yFgOYQi/tO36tVLBr4Zm0Ck7UOW+CrXqstV1UAn3aE96P
+Yt2/9wKBgQDThEU8kWONFLpQI/sZrlLDrt50ipWL3v/xeWuQlfQCI2Lr0u6PktxD
+NSxw6yRw/jRiXRlL8+2eYsSqREqNNbgYYngv2v+futqfIuPaqlNVonbR/JXFPFVo
+vWlq4ZcJ6P2cq+IOGifZd5mYTSjGey7T6WFapo7bl7mnuwoDP4S40A==
+-----END RSA PRIVATE KEY-----
+`)
+		c        = New().SetPrivateKey(expected)
+	)
+
+	if !bytes.Equal(c.GetPrivateKey(), expected) {
+		t.Errorf("Expected private key %s, got %s", expected, c.GetPrivateKey())
+	}
+}
+
+func TestContainer_SetPrivateKey(t *testing.T) {
+	var (
+		expected = []byte(`-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAxvOAnF7nBClMm7emHlE6AjgktUehT8ZNkNDg/FFScqgb9L/n
+O5EuRLW/wE3CjkRMh3pMdo+lbFCxtThevKcLtHr+k1UceqhCXq0OvlnOj39+AAd6
+sJgPAnvA2y+stMFz2JuOxldUp3OvdQgCzpj2ZoMRAOwViJW9PiIGfD3SnvOVJ35j
+Uo8GP9pvBZUcry3PW2SuxJW0CKmQgTjwfnGtZKfrN8Rf3n2JtRv0wQbyTGhgJG2x
+ROt97YdgK//dZ/II4nUWVZ5bVmzsPmEzU5Q0ydOOtCroI2wJVL/0otQ0DKEzxdVG
+/V5l71FcOpbLSfSFicH7kn+KOozPeSG+ltySeQIDAQABAoIBAQCw2rEPUEWoK1ZQ
+blabSLV6V5I6G6zID43QF/6IDXpvNgVz8kuJZittJOuJ9RXoBcrJ++uQ0WzJ9omi
+gLOmnBAJpfQ74ELqvjwRkWEz0P2QDlNhj0R/Swy8tmnf7mdmXzmt6cpngiZcnLfy
+Hubv5IXU5tnsqfESc5nAa9q8AvECHhBYhgXRgJK9gfqNReWZHWxTg2P2Df1hHd3m
+F1GTUmqvvzeuHdBRoTsaQpfClgw5bRgSOECR46kanXb1TXsnTYU2Ym9WNPL0hlQj
+2rKrukTVOdaBk6231kXNI4siS4DOwhfUXRGt8Yh4v3e4Hn6eZpqc7IcSH3gQ+QUa
+v18iE1uJAoGBAOz3SFib99hJHpvfFsBb6F4iQFSOLhQ5ZdX0ONj6Bw6HK/K2fwmI
+PFS8YYmaSif6o14r3wIz1tCLPdlkZ39wgrTv0ALpcoWjQTAQPdkupdcwAHNE3Q7g
+L16GoAtRKpiNj24mmItjvWy+J0fkDiqZGRrv9+whR9Tz7+3CcfskhyLTAoGBANbu
+hje/YJfY4oLw6r7Lv4sTKM063pr4maP7bCOZPsiVW4awKODR1OlyDf89s+AOQCU9
+/mrSzfOwz1VJzbYRVyPFDTrBy9d8e7La1krVNOHMssIF8mPS+0qMIn54HkCRyPKr
+ecTJ1k8W7BVXe18UsGIstdaIrjYYeizz8vX3He4DAoGARvWRw38JC8pxkQmP/ZBI
+GBA3pVpiMAo0FYqpj0fn3xDZNzgw+IDEWDeFGbiLJkemrieDA1zUoeRgY/3uBDqD
+2XzKlGSlt6D4f1UNwEB4xuSH7fycGb1GUg8MU/c9Qyt43OpP2cXHTo3uo1eGanko
+DGn5mssogHt/yHnmuebpVKMCgYAqzSdHVMIsmxFImCd3RWXokTEv5YhM/jLCeCAp
+2qupEC1A3jXVx5OJxZ/J84StmsjlYboXldFTtSMkzeS8XCmpQuWGjO9GA1Ey5eeE
+0X6NdNEoWDzT6kEGsG9yFgOYQi/tO36tVLBr4Zm0Ck7UOW+CrXqstV1UAn3aE96P
+Yt2/9wKBgQDThEU8kWONFLpQI/sZrlLDrt50ipWL3v/xeWuQlfQCI2Lr0u6PktxD
+NSxw6yRw/jRiXRlL8+2eYsSqREqNNbgYYngv2v+futqfIuPaqlNVonbR/JXFPFVo
+vWlq4ZcJ6P2cq+IOGifZd5mYTSjGey7T6WFapo7bl7mnuwoDP4S40A==
+-----END RSA PRIVATE KEY-----
+`)
+		c        = New().SetPrivateKey(expected)
+	)
+
+	if !bytes.Equal(c.GetPrivateKey(), expected) {
+		t.Errorf("Expected private key %s, got %s", expected, c.GetPrivateKey())
+	}
+}
+
+func TestContainer_SetEmail(t *testing.T) {
+	var (
+		expected = []byte("myemail@cool-domain.com")
+		c        = New().SetEmail(expected)
+	)
+
+	if !bytes.Equal(c.GetEmail(), expected) {
+		t.Errorf("Expected email %s, got %s", expected, c.GetEmail())
+	}
+}
+
+func TestContainer_GetEmail(t *testing.T) {
+	var (
+		expected = []byte("myemail@cool-domain.com")
+		c        = New().SetEmail(expected)
+	)
+
+	if !bytes.Equal(c.GetEmail(), expected) {
+		t.Errorf("Expected email %s, got %s", expected, c.GetEmail())
+	}
+}
+
+func TestContainer_SetUsername(t *testing.T) {
+	var (
+		expected = []byte("My Super cool Username")
+		c        = New().SetUsername(expected)
+	)
+
+	if !bytes.Equal(c.GetUsername(), expected) {
+		t.Errorf("Expected email %s, got %s", expected, c.GetUsername())
+	}
+}
+
+func TestContainer_GetUsername(t *testing.T) {
+	var (
+		expected = []byte("My Super cool Username")
+		c        = New().SetUsername(expected)
+	)
+
+	if !bytes.Equal(c.GetUsername(), expected) {
+		t.Errorf("Expected email %s, got %s", expected, c.GetUsername())
+	}
+}
+
+func TestContainer_SetToken(t *testing.T) {
+	var (
+		expected = make([]byte, 15)
+		c        = New()
+	)
+
+	_, err := rand.Read(expected)
+	if err != nil {
+		t.Errorf("generate token error: %s", err.Error())
+	}
+	c.SetToken(expected)
+
+	if !bytes.Equal(c.GetToken(), expected) {
+		t.Errorf("Expected token %#v, got %#v", expected, c.GetToken())
+	}
+}
+
+func TestContainer_GetToken(t *testing.T) {
+	var (
+		expected = make([]byte, 15)
+		c        = New()
+	)
+
+	_, err := rand.Read(expected)
+	if err != nil {
+		t.Errorf("generate token error: %s", err.Error())
+	}
+	c.SetToken(expected)
+
+	if !bytes.Equal(c.GetToken(), expected) {
+		t.Errorf("Expected token %#v, got %#v", expected, c.GetToken())
+	}
+}
+
+func TestContainer_SetSignature(t *testing.T) {
+	var (
+		expected = make([]byte, 32)
+		c        = New()
+	)
+
+	_, err := rand.Read(expected)
+	if err != nil {
+		t.Errorf("generate signature error: %s", err.Error())
+	}
+	c.SetSignature(expected)
+
+	if !bytes.Equal(c.GetSignature(), expected) {
+		t.Errorf("Expected signature %#v, got %#v", expected, c.GetSignature())
+	}
+}
+
+func TestContainer_GetSignature(t *testing.T) {
+	var (
+		expected = make([]byte, 32)
+		c        = New()
+	)
+
+	_, err := rand.Read(expected)
+	if err != nil {
+		t.Errorf("generate signature error: %s", err.Error())
+	}
+	c.SetSignature(expected)
+
+	if !bytes.Equal(c.GetSignature(), expected) {
+		t.Errorf("Expected signature %#v, got %#v", expected, c.GetSignature())
+	}
+}
+
+func TestContainer_GetRootCertificate(t *testing.T) {
+	var (
+		expected = []byte(`-----BEGIN CERTIFICATE-----
+MIICwzCCAaugAwIBAgIJAOUotzKKlJNFMA0GCSqGSIb3DQEBBQUAMBQxEjAQBgNV
+BAMTCWxvY2FsaG9zdDAeFw0yMTA2MDExOTU2MDRaFw0zMTA1MzAxOTU2MDRaMBQx
+EjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAMbzgJxe5wQpTJu3ph5ROgI4JLVHoU/GTZDQ4PxRUnKoG/S/5zuRLkS1v8BN
+wo5ETId6THaPpWxQsbU4XrynC7R6/pNVHHqoQl6tDr5Zzo9/fgAHerCYDwJ7wNsv
+rLTBc9ibjsZXVKdzr3UIAs6Y9maDEQDsFYiVvT4iBnw90p7zlSd+Y1KPBj/abwWV
+HK8tz1tkrsSVtAipkIE48H5xrWSn6zfEX959ibUb9MEG8kxoYCRtsUTrfe2HYCv/
+3WfyCOJ1FlWeW1Zs7D5hM1OUNMnTjrQq6CNsCVS/9KLUNAyhM8XVRv1eZe9RXDqW
+y0n0hYnB+5J/ijqMz3khvpbcknkCAwEAAaMYMBYwFAYDVR0RBA0wC4IJbG9jYWxo
+b3N0MA0GCSqGSIb3DQEBBQUAA4IBAQBagAOvZKRBj8T+4DX9NbzRNRjbXQg0taEg
+ybYKnbh6KOQd6hpk1oQ8nG1xj0qWJgCr48Qthg1mZyF4wroi0p3b/QBmZnqjweel
+Ykfb7Qzu6cI1qR5GPveYeIc9JXnNB8flw95+d4B5ozYzruwSglTBnPqo44Imhc5N
+NrahdQNtYIdQAinMb5SEvXrz1SsAqkHmWcIxHnKFiHkNJ6q/EjtVEwXI/AiFaygv
+k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
+UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
+-----END CERTIFICATE-----
+`)
+		c        = New().SetRootCertificate(expected)
+	)
+
+	if !bytes.Equal(c.GetRootCertificate(), expected) {
+		t.Errorf("Expected root certificate %s, got %s", expected, c.GetRootCertificate())
+	}
+}
+
+func TestContainer_SetRootCertificate(t *testing.T) {
+	var (
+		expected = []byte(`-----BEGIN CERTIFICATE-----
+MIICwzCCAaugAwIBAgIJAOUotzKKlJNFMA0GCSqGSIb3DQEBBQUAMBQxEjAQBgNV
+BAMTCWxvY2FsaG9zdDAeFw0yMTA2MDExOTU2MDRaFw0zMTA1MzAxOTU2MDRaMBQx
+EjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAMbzgJxe5wQpTJu3ph5ROgI4JLVHoU/GTZDQ4PxRUnKoG/S/5zuRLkS1v8BN
+wo5ETId6THaPpWxQsbU4XrynC7R6/pNVHHqoQl6tDr5Zzo9/fgAHerCYDwJ7wNsv
+rLTBc9ibjsZXVKdzr3UIAs6Y9maDEQDsFYiVvT4iBnw90p7zlSd+Y1KPBj/abwWV
+HK8tz1tkrsSVtAipkIE48H5xrWSn6zfEX959ibUb9MEG8kxoYCRtsUTrfe2HYCv/
+3WfyCOJ1FlWeW1Zs7D5hM1OUNMnTjrQq6CNsCVS/9KLUNAyhM8XVRv1eZe9RXDqW
+y0n0hYnB+5J/ijqMz3khvpbcknkCAwEAAaMYMBYwFAYDVR0RBA0wC4IJbG9jYWxo
+b3N0MA0GCSqGSIb3DQEBBQUAA4IBAQBagAOvZKRBj8T+4DX9NbzRNRjbXQg0taEg
+ybYKnbh6KOQd6hpk1oQ8nG1xj0qWJgCr48Qthg1mZyF4wroi0p3b/QBmZnqjweel
+Ykfb7Qzu6cI1qR5GPveYeIc9JXnNB8flw95+d4B5ozYzruwSglTBnPqo44Imhc5N
+NrahdQNtYIdQAinMb5SEvXrz1SsAqkHmWcIxHnKFiHkNJ6q/EjtVEwXI/AiFaygv
+k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
+UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
+-----END CERTIFICATE-----
+`)
+		c        = New().SetRootCertificate(expected)
+	)
+
+	if !bytes.Equal(c.GetRootCertificate(), expected) {
+		t.Errorf("Expected root certificate %s, got %s", expected, c.GetRootCertificate())
+	}
+}
+
+func TestContainer_GetSemVer(t *testing.T) {
+	var (
+		expected = "2.15.7"
+		c = New()
+	)
+	c.SetVersionMajor(2).
+	  SetVersionMinor(15).
+	  SetVersionPatch(7)
+
+	if c.GetSemVer() != expected {
+		t.Errorf("expected semver '%s', got '%s'", expected, c.GetSemVer())
+	}
+}
+
+func TestContainer_GetX509Certificate(t *testing.T) {
+	var (
+		certBytes = []byte(`-----BEGIN CERTIFICATE-----
+MIICwzCCAaugAwIBAgIJAOUotzKKlJNFMA0GCSqGSIb3DQEBBQUAMBQxEjAQBgNV
+BAMTCWxvY2FsaG9zdDAeFw0yMTA2MDExOTU2MDRaFw0zMTA1MzAxOTU2MDRaMBQx
+EjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAMbzgJxe5wQpTJu3ph5ROgI4JLVHoU/GTZDQ4PxRUnKoG/S/5zuRLkS1v8BN
+wo5ETId6THaPpWxQsbU4XrynC7R6/pNVHHqoQl6tDr5Zzo9/fgAHerCYDwJ7wNsv
+rLTBc9ibjsZXVKdzr3UIAs6Y9maDEQDsFYiVvT4iBnw90p7zlSd+Y1KPBj/abwWV
+HK8tz1tkrsSVtAipkIE48H5xrWSn6zfEX959ibUb9MEG8kxoYCRtsUTrfe2HYCv/
+3WfyCOJ1FlWeW1Zs7D5hM1OUNMnTjrQq6CNsCVS/9KLUNAyhM8XVRv1eZe9RXDqW
+y0n0hYnB+5J/ijqMz3khvpbcknkCAwEAAaMYMBYwFAYDVR0RBA0wC4IJbG9jYWxo
+b3N0MA0GCSqGSIb3DQEBBQUAA4IBAQBagAOvZKRBj8T+4DX9NbzRNRjbXQg0taEg
+ybYKnbh6KOQd6hpk1oQ8nG1xj0qWJgCr48Qthg1mZyF4wroi0p3b/QBmZnqjweel
+Ykfb7Qzu6cI1qR5GPveYeIc9JXnNB8flw95+d4B5ozYzruwSglTBnPqo44Imhc5N
+NrahdQNtYIdQAinMb5SEvXrz1SsAqkHmWcIxHnKFiHkNJ6q/EjtVEwXI/AiFaygv
+k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
+UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
+-----END CERTIFICATE-----
+`)
+		c = New().SetCertificate(certBytes)
+	)
+
+	_, err := c.GetX509Certificate()
+	if err != nil {
+		t.Errorf("expected certificate as x509.Certificate, got error '%s'", err.Error())
+	}
+}
+
+func TestContainer_GetTlsCertificate(t *testing.T) {
+	var (
+		certBytes = []byte(`-----BEGIN CERTIFICATE-----
+MIICwzCCAaugAwIBAgIJAOUotzKKlJNFMA0GCSqGSIb3DQEBBQUAMBQxEjAQBgNV
+BAMTCWxvY2FsaG9zdDAeFw0yMTA2MDExOTU2MDRaFw0zMTA1MzAxOTU2MDRaMBQx
+EjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAMbzgJxe5wQpTJu3ph5ROgI4JLVHoU/GTZDQ4PxRUnKoG/S/5zuRLkS1v8BN
+wo5ETId6THaPpWxQsbU4XrynC7R6/pNVHHqoQl6tDr5Zzo9/fgAHerCYDwJ7wNsv
+rLTBc9ibjsZXVKdzr3UIAs6Y9maDEQDsFYiVvT4iBnw90p7zlSd+Y1KPBj/abwWV
+HK8tz1tkrsSVtAipkIE48H5xrWSn6zfEX959ibUb9MEG8kxoYCRtsUTrfe2HYCv/
+3WfyCOJ1FlWeW1Zs7D5hM1OUNMnTjrQq6CNsCVS/9KLUNAyhM8XVRv1eZe9RXDqW
+y0n0hYnB+5J/ijqMz3khvpbcknkCAwEAAaMYMBYwFAYDVR0RBA0wC4IJbG9jYWxo
+b3N0MA0GCSqGSIb3DQEBBQUAA4IBAQBagAOvZKRBj8T+4DX9NbzRNRjbXQg0taEg
+ybYKnbh6KOQd6hpk1oQ8nG1xj0qWJgCr48Qthg1mZyF4wroi0p3b/QBmZnqjweel
+Ykfb7Qzu6cI1qR5GPveYeIc9JXnNB8flw95+d4B5ozYzruwSglTBnPqo44Imhc5N
+NrahdQNtYIdQAinMb5SEvXrz1SsAqkHmWcIxHnKFiHkNJ6q/EjtVEwXI/AiFaygv
+k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
+UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
+-----END CERTIFICATE-----
+`)
+		pkBytes = []byte(`-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAxvOAnF7nBClMm7emHlE6AjgktUehT8ZNkNDg/FFScqgb9L/n
+O5EuRLW/wE3CjkRMh3pMdo+lbFCxtThevKcLtHr+k1UceqhCXq0OvlnOj39+AAd6
+sJgPAnvA2y+stMFz2JuOxldUp3OvdQgCzpj2ZoMRAOwViJW9PiIGfD3SnvOVJ35j
+Uo8GP9pvBZUcry3PW2SuxJW0CKmQgTjwfnGtZKfrN8Rf3n2JtRv0wQbyTGhgJG2x
+ROt97YdgK//dZ/II4nUWVZ5bVmzsPmEzU5Q0ydOOtCroI2wJVL/0otQ0DKEzxdVG
+/V5l71FcOpbLSfSFicH7kn+KOozPeSG+ltySeQIDAQABAoIBAQCw2rEPUEWoK1ZQ
+blabSLV6V5I6G6zID43QF/6IDXpvNgVz8kuJZittJOuJ9RXoBcrJ++uQ0WzJ9omi
+gLOmnBAJpfQ74ELqvjwRkWEz0P2QDlNhj0R/Swy8tmnf7mdmXzmt6cpngiZcnLfy
+Hubv5IXU5tnsqfESc5nAa9q8AvECHhBYhgXRgJK9gfqNReWZHWxTg2P2Df1hHd3m
+F1GTUmqvvzeuHdBRoTsaQpfClgw5bRgSOECR46kanXb1TXsnTYU2Ym9WNPL0hlQj
+2rKrukTVOdaBk6231kXNI4siS4DOwhfUXRGt8Yh4v3e4Hn6eZpqc7IcSH3gQ+QUa
+v18iE1uJAoGBAOz3SFib99hJHpvfFsBb6F4iQFSOLhQ5ZdX0ONj6Bw6HK/K2fwmI
+PFS8YYmaSif6o14r3wIz1tCLPdlkZ39wgrTv0ALpcoWjQTAQPdkupdcwAHNE3Q7g
+L16GoAtRKpiNj24mmItjvWy+J0fkDiqZGRrv9+whR9Tz7+3CcfskhyLTAoGBANbu
+hje/YJfY4oLw6r7Lv4sTKM063pr4maP7bCOZPsiVW4awKODR1OlyDf89s+AOQCU9
+/mrSzfOwz1VJzbYRVyPFDTrBy9d8e7La1krVNOHMssIF8mPS+0qMIn54HkCRyPKr
+ecTJ1k8W7BVXe18UsGIstdaIrjYYeizz8vX3He4DAoGARvWRw38JC8pxkQmP/ZBI
+GBA3pVpiMAo0FYqpj0fn3xDZNzgw+IDEWDeFGbiLJkemrieDA1zUoeRgY/3uBDqD
+2XzKlGSlt6D4f1UNwEB4xuSH7fycGb1GUg8MU/c9Qyt43OpP2cXHTo3uo1eGanko
+DGn5mssogHt/yHnmuebpVKMCgYAqzSdHVMIsmxFImCd3RWXokTEv5YhM/jLCeCAp
+2qupEC1A3jXVx5OJxZ/J84StmsjlYboXldFTtSMkzeS8XCmpQuWGjO9GA1Ey5eeE
+0X6NdNEoWDzT6kEGsG9yFgOYQi/tO36tVLBr4Zm0Ck7UOW+CrXqstV1UAn3aE96P
+Yt2/9wKBgQDThEU8kWONFLpQI/sZrlLDrt50ipWL3v/xeWuQlfQCI2Lr0u6PktxD
+NSxw6yRw/jRiXRlL8+2eYsSqREqNNbgYYngv2v+futqfIuPaqlNVonbR/JXFPFVo
+vWlq4ZcJ6P2cq+IOGifZd5mYTSjGey7T6WFapo7bl7mnuwoDP4S40A==
+-----END RSA PRIVATE KEY-----
+`)
+		c = New().SetCertificate(certBytes).SetPrivateKey(pkBytes)
+	)
+
+	_, err := c.GetTlsCertificate()
+	if err != nil {
+		t.Errorf("expected tls.Certificate, got error '%s'", err.Error())
+	}
+}
+
+func TestContainer_GetX509RootCertificate(t *testing.T) {
+	var (
+		certBytes = []byte(`-----BEGIN CERTIFICATE-----
+MIICwzCCAaugAwIBAgIJAOUotzKKlJNFMA0GCSqGSIb3DQEBBQUAMBQxEjAQBgNV
+BAMTCWxvY2FsaG9zdDAeFw0yMTA2MDExOTU2MDRaFw0zMTA1MzAxOTU2MDRaMBQx
+EjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAMbzgJxe5wQpTJu3ph5ROgI4JLVHoU/GTZDQ4PxRUnKoG/S/5zuRLkS1v8BN
+wo5ETId6THaPpWxQsbU4XrynC7R6/pNVHHqoQl6tDr5Zzo9/fgAHerCYDwJ7wNsv
+rLTBc9ibjsZXVKdzr3UIAs6Y9maDEQDsFYiVvT4iBnw90p7zlSd+Y1KPBj/abwWV
+HK8tz1tkrsSVtAipkIE48H5xrWSn6zfEX959ibUb9MEG8kxoYCRtsUTrfe2HYCv/
+3WfyCOJ1FlWeW1Zs7D5hM1OUNMnTjrQq6CNsCVS/9KLUNAyhM8XVRv1eZe9RXDqW
+y0n0hYnB+5J/ijqMz3khvpbcknkCAwEAAaMYMBYwFAYDVR0RBA0wC4IJbG9jYWxo
+b3N0MA0GCSqGSIb3DQEBBQUAA4IBAQBagAOvZKRBj8T+4DX9NbzRNRjbXQg0taEg
+ybYKnbh6KOQd6hpk1oQ8nG1xj0qWJgCr48Qthg1mZyF4wroi0p3b/QBmZnqjweel
+Ykfb7Qzu6cI1qR5GPveYeIc9JXnNB8flw95+d4B5ozYzruwSglTBnPqo44Imhc5N
+NrahdQNtYIdQAinMb5SEvXrz1SsAqkHmWcIxHnKFiHkNJ6q/EjtVEwXI/AiFaygv
+k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
+UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
+-----END CERTIFICATE-----
+`)
+		c = New().SetRootCertificate(certBytes)
+	)
+
+	_, err := c.GetX509RootCertificate()
+	if err != nil {
+		t.Errorf("expected root certificate as x509.Certificate, got error '%s'", err.Error())
 	}
 }
 

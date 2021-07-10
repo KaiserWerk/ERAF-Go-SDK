@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"io"
+	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
@@ -177,7 +178,7 @@ k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
 UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
 -----END CERTIFICATE-----
 `)
-		c        = New().SetCertificate(expected)
+		c = New().SetCertificate(expected)
 	)
 
 	if !bytes.Equal(c.GetCertificate(), expected) {
@@ -205,7 +206,7 @@ k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
 UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
 -----END CERTIFICATE-----
 `)
-		c        = New().SetCertificate(expected)
+		c = New().SetCertificate(expected)
 	)
 
 	if !bytes.Equal(c.GetCertificate(), expected) {
@@ -243,7 +244,7 @@ NSxw6yRw/jRiXRlL8+2eYsSqREqNNbgYYngv2v+futqfIuPaqlNVonbR/JXFPFVo
 vWlq4ZcJ6P2cq+IOGifZd5mYTSjGey7T6WFapo7bl7mnuwoDP4S40A==
 -----END RSA PRIVATE KEY-----
 `)
-		c        = New().SetPrivateKey(expected)
+		c = New().SetPrivateKey(expected)
 	)
 
 	if !bytes.Equal(c.GetPrivateKey(), expected) {
@@ -281,7 +282,7 @@ NSxw6yRw/jRiXRlL8+2eYsSqREqNNbgYYngv2v+futqfIuPaqlNVonbR/JXFPFVo
 vWlq4ZcJ6P2cq+IOGifZd5mYTSjGey7T6WFapo7bl7mnuwoDP4S40A==
 -----END RSA PRIVATE KEY-----
 `)
-		c        = New().SetPrivateKey(expected)
+		c = New().SetPrivateKey(expected)
 	)
 
 	if !bytes.Equal(c.GetPrivateKey(), expected) {
@@ -421,7 +422,7 @@ k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
 UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
 -----END CERTIFICATE-----
 `)
-		c        = New().SetRootCertificate(expected)
+		c = New().SetRootCertificate(expected)
 	)
 
 	if !bytes.Equal(c.GetRootCertificate(), expected) {
@@ -449,7 +450,7 @@ k9ucwYmQXsw8KLVPtd8nFd7+rNl17RkoLRWyKlxPd2pDJPR/EjFVuE17YPcPfDNo
 UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
 -----END CERTIFICATE-----
 `)
-		c        = New().SetRootCertificate(expected)
+		c = New().SetRootCertificate(expected)
 	)
 
 	if !bytes.Equal(c.GetRootCertificate(), expected) {
@@ -460,11 +461,11 @@ UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
 func TestContainer_GetSemVer(t *testing.T) {
 	var (
 		expected = "2.15.7"
-		c = New()
+		c        = New()
 	)
 	c.SetVersionMajor(2).
-	  SetVersionMinor(15).
-	  SetVersionPatch(7)
+		SetVersionMinor(15).
+		SetVersionPatch(7)
 
 	if c.GetSemVer() != expected {
 		t.Errorf("expected semver '%s', got '%s'", expected, c.GetSemVer())
@@ -588,16 +589,16 @@ UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
 
 func TestContainer_Len(t *testing.T) {
 	tests := []struct {
-		name   string
+		name      string
 		container *Container
-		want   int
+		want      int
 	}{
 		{name: "empty", container: New(), want: 49},
 		{name: "with username", container: func() *Container {
 			return New().SetUsername([]byte("mycoolusername"))
 		}(), want: 63},
 		{name: "with username and nonce", container: func() *Container {
-			return New().SetUsername([]byte("mycoolusername")).SetNonce([]byte{1,2,3,4,5,6,7,8,9})
+			return New().SetUsername([]byte("mycoolusername")).SetNonce([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9})
 		}(), want: 72},
 	}
 	for _, tt := range tests {
@@ -611,8 +612,8 @@ func TestContainer_Len(t *testing.T) {
 
 func TestContainer_HeaderLen(t *testing.T) {
 	var (
-		expected = int(headerSize) + 3
-		c = New()
+		expected = int(headerSize)
+		c        = New()
 	)
 
 	if c.HeaderLen() != expected {
@@ -642,7 +643,7 @@ func TestContainer_PayloadLen(t *testing.T) {
 
 func TestContainer_Headers(t *testing.T) {
 	var (
-		c = New()
+		c       = New()
 		headers = c.Headers()
 	)
 
@@ -681,8 +682,6 @@ func TestContainer_Payload(t *testing.T) {
 	}
 }
 
-
-
 //func TestContainer_Read(t *testing.T) {
 //	type args struct {
 //		s []byte
@@ -714,13 +713,78 @@ func TestContainer_Payload(t *testing.T) {
 //	}
 //}
 
+func TestContainer_MarshalToFile(t *testing.T) {
+	const (
+		filenameEmpty                = "__empty.eraf"
+		filenameEmptyFromConstructor = "__empty.eraf"
+		filenameWithUsername         = "__empty_w_username.eraf"
+	)
+	type args struct {
+		file  string
+		perms os.FileMode
+	}
 
+	defer func() {
+		_ = os.Remove(filenameEmpty)
+		_ = os.Remove(filenameEmptyFromConstructor)
+		_ = os.Remove(filenameWithUsername)
+	}()
 
+	tests := []struct {
+		name      string
+		container *Container
+		args      args
+		wantErr   bool
+	}{
+		{name: "empty", container: &Container{}, args: args{file: filenameEmpty, perms: 0700}, wantErr: false},
+		{name: "empty from constructor", container: New(), args: args{file: filenameEmptyFromConstructor, perms: 0700}, wantErr: false},
+		{name: "with username", container: New().SetUsername([]byte("my-cool-username")), args: args{file: filenameWithUsername, perms: 0700}, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.container.MarshalToFile(tt.args.file, tt.args.perms); (err != nil) != tt.wantErr {
+				t.Errorf("MarshalToFile() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestContainer_Marshal(t *testing.T) {
+	type args struct {
+		writer io.Writer
+	}
+
+	fh, err := ioutil.TempFile(os.TempDir(), "eraf-test-*")
+	if err != nil {
+		t.Fatalf("could not create temporary file")
+	}
+	defer func() {
+		_ = fh.Close()
+		_ = os.Remove(fh.Name())
+	}()
+
+	tests := []struct {
+		name      string
+		container *Container
+		args      args
+		wantErr   bool
+	}{
+		{name: "empty to buffer", container: &Container{}, args: args{writer: &bytes.Buffer{}}, wantErr: false},
+		{name: "empty from constructor to discard", container: New(), args: args{writer: io.Discard}, wantErr: false},
+		{name: "with username to file", container: New().SetUsername([]byte("my-cool-username")), args: args{writer: fh}, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.container.Marshal(tt.args.writer); (err != nil) != tt.wantErr {
+				t.Errorf("Marshal() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
 
 /**
- Benchmark tests
- */
-
+Benchmark tests
+*/
 
 func BenchmarkUnmarshalFromFile(b *testing.B) {
 	const filename = "__bench_unmarshal_from_file.eraf"
@@ -797,5 +861,24 @@ func BenchmarkMarshalToFile(b *testing.B) {
 		if err != nil {
 			b.Errorf(err.Error())
 		}
+	}
+}
+
+func TestContainer_MarshalBytes(t *testing.T) {
+	tests := []struct {
+		name      string
+		container *Container
+		wantedLen int
+	}{
+		{name: "empty", container: &Container{}, wantedLen: 49},
+		{name: "with email", container: (&Container{}).SetEmail([]byte("my-cool-email@abc.com")), wantedLen: 70},
+		{name: "with tag", container: (&Container{}).SetTag([]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), wantedLen: 59},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.container.MarshalBytes(); len(got) != tt.wantedLen {
+				t.Errorf("MarshalBytes() = %d, want %d", len(got), tt.wantedLen)
+			}
+		})
 	}
 }

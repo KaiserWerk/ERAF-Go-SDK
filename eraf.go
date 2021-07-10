@@ -513,8 +513,8 @@ func UnmarshalBytes(allBytes []byte, target *Container) error {
 	return nil
 }
 
-// EncryptEverything take a key to encrypt every data block using AES-256 in place. The nonce field is used to store
-// meta data; if already set, it will be overwritten. All block will be encrypted and written back, no data is
+// EncryptEverything take a key to encrypt every data block using AES in place. The nonce field is used to store the
+// required meta data; if already set, it will be overwritten. All blocks will be encrypted and written back, no data is
 // returned. Requires a key with a length of 16 bytes (AES-128), 24 bytes (AES-192) or 32 bytes (AES-256).
 func (c *Container) EncryptEverything(key []byte) error {
 	// create and set nonce for further use

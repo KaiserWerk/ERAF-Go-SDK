@@ -513,6 +513,89 @@ func UnmarshalBytes(allBytes []byte, target *Container) error {
 	return nil
 }
 
+// CalculateHeaders sets the header bytes to correct values corresponding to field offsets and lengths
+func (c *Container) CalculateHeaders() {
+	header := headerBlock[:]
+
+	var (
+		versionLength     = uint16(3)
+		nonceLength       = uint16(len(c.nonce))
+		tagLength         = uint16(len(c.tag))
+		snLength          = uint16(len(c.serialNumber))
+		piLength          = uint16(len(c.identifier))
+		certificateLength = uint16(len(c.certificate))
+		privateKeyLength  = uint16(len(c.privateKey))
+		emailLength       = uint16(len(c.email))
+		usernameLength    = uint16(len(c.username))
+		tokenLength       = uint16(len(c.token))
+		signatureLength   = uint16(len(c.signature))
+		rootCertLength    = uint16(len(c.rootCertificate))
+	)
+
+	var offset uint16 = 0
+
+	// version
+	// no need to set any values
+	offset += versionLength
+
+	// nonce
+	binary.BigEndian.PutUint16(header[2:4], offset)
+	binary.BigEndian.PutUint16(header[4:6], nonceLength)
+	offset += nonceLength
+
+	// tag
+	binary.BigEndian.PutUint16(header[6:8], offset)
+	binary.BigEndian.PutUint16(header[8:10], tagLength)
+	offset += tagLength
+
+	// serial number
+	binary.BigEndian.PutUint16(header[10:12], offset)
+	binary.BigEndian.PutUint16(header[12:14], snLength)
+	offset += snLength
+
+	// personal identifier
+	binary.BigEndian.PutUint16(header[14:16], offset)
+	binary.BigEndian.PutUint16(header[16:18], piLength)
+	offset += piLength
+
+	// certificate
+	binary.BigEndian.PutUint16(header[18:20], offset)
+	binary.BigEndian.PutUint16(header[20:22], certificateLength)
+	offset += certificateLength
+
+	// private key
+	binary.BigEndian.PutUint16(header[22:24], offset)
+	binary.BigEndian.PutUint16(header[24:26], privateKeyLength)
+	offset += privateKeyLength
+
+	// email
+	binary.BigEndian.PutUint16(header[26:28], offset)
+	binary.BigEndian.PutUint16(header[28:30], emailLength)
+	offset += emailLength
+
+	// username
+	binary.BigEndian.PutUint16(header[30:32], offset)
+	binary.BigEndian.PutUint16(header[32:34], usernameLength)
+	offset += usernameLength
+
+	// token
+	binary.BigEndian.PutUint16(header[34:36], offset)
+	binary.BigEndian.PutUint16(header[36:38], tokenLength)
+	offset += tokenLength
+
+	// signature
+	binary.BigEndian.PutUint16(header[38:40], offset)
+	binary.BigEndian.PutUint16(header[40:42], signatureLength)
+	offset += signatureLength
+
+	// root certificate
+	binary.BigEndian.PutUint16(header[42:44], offset)
+	binary.BigEndian.PutUint16(header[44:], rootCertLength) // leave upper bound open
+	//offset += rootCertLength // no need to increase this further
+
+	copy(c.headers[:], header)
+}
+
 // EncryptEverything take a key to encrypt every data block using AES in place. The nonce field is used to store the
 // required meta data; if already set, it will be overwritten. All blocks will be encrypted and written back, no data is
 // returned. Requires a key with a length of 16 bytes (AES-128), 24 bytes (AES-192) or 32 bytes (AES-256).
@@ -738,89 +821,6 @@ func (c *Container) DecryptSignature(key []byte) ([]byte, error) {
 // DecryptRootCertificate decrypts and returns the root certificate
 func (c *Container) DecryptRootCertificate(key []byte) ([]byte, error) {
 	return decryptAes(key, c.rootCertificate, c.nonce)
-}
-
-// CalculateHeaders sets the header bytes to correct values corresponding to field offsets and lengths
-func (c *Container) CalculateHeaders() {
-	header := headerBlock[:]
-
-	var (
-		versionLength     = uint16(3)
-		nonceLength       = uint16(len(c.nonce))
-		tagLength         = uint16(len(c.tag))
-		snLength          = uint16(len(c.serialNumber))
-		piLength          = uint16(len(c.identifier))
-		certificateLength = uint16(len(c.certificate))
-		privateKeyLength  = uint16(len(c.privateKey))
-		emailLength       = uint16(len(c.email))
-		usernameLength    = uint16(len(c.username))
-		tokenLength       = uint16(len(c.token))
-		signatureLength   = uint16(len(c.signature))
-		rootCertLength    = uint16(len(c.rootCertificate))
-	)
-
-	var offset uint16 = 0 //uint16(headerSize)
-
-	// version
-	// no need to set any values
-	offset += versionLength
-
-	// nonce
-	binary.BigEndian.PutUint16(header[2:4], offset)
-	binary.BigEndian.PutUint16(header[4:6], nonceLength)
-	offset += nonceLength
-
-	// tag
-	binary.BigEndian.PutUint16(header[6:8], offset)
-	binary.BigEndian.PutUint16(header[8:10], tagLength)
-	offset += tagLength
-
-	// serial number
-	binary.BigEndian.PutUint16(header[10:12], offset)
-	binary.BigEndian.PutUint16(header[12:14], snLength)
-	offset += snLength
-
-	// personal identifier
-	binary.BigEndian.PutUint16(header[14:16], offset)
-	binary.BigEndian.PutUint16(header[16:18], piLength)
-	offset += piLength
-
-	// certificate
-	binary.BigEndian.PutUint16(header[18:20], offset)
-	binary.BigEndian.PutUint16(header[20:22], certificateLength)
-	offset += certificateLength
-
-	// private key
-	binary.BigEndian.PutUint16(header[22:24], offset)
-	binary.BigEndian.PutUint16(header[24:26], privateKeyLength)
-	offset += privateKeyLength
-
-	// email
-	binary.BigEndian.PutUint16(header[26:28], offset)
-	binary.BigEndian.PutUint16(header[28:30], emailLength)
-	offset += emailLength
-
-	// username
-	binary.BigEndian.PutUint16(header[30:32], offset)
-	binary.BigEndian.PutUint16(header[32:34], usernameLength)
-	offset += usernameLength
-
-	// token
-	binary.BigEndian.PutUint16(header[34:36], offset)
-	binary.BigEndian.PutUint16(header[36:38], tokenLength)
-	offset += tokenLength
-
-	// signature
-	binary.BigEndian.PutUint16(header[38:40], offset)
-	binary.BigEndian.PutUint16(header[40:42], signatureLength)
-	offset += signatureLength
-
-	// root certificate
-	binary.BigEndian.PutUint16(header[42:44], offset)
-	binary.BigEndian.PutUint16(header[44:], rootCertLength) // leave upper bound open
-	//offset += rootCertLength // no need to increase this further
-
-	copy(c.headers[:], header)
 }
 
 // Dump just writes all field contents into an io.Writer

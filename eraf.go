@@ -225,12 +225,12 @@ func (c *Container) SetUsername(u []byte) *Container {
 	return c
 }
 
-// GetUsername returns the username
+// GetPassowrd returns the password
 func (c *Container) GetPassowrd() []byte {
 	return c.Password
 }
 
-// SetUsername sets a username
+// SetPassword sets a password
 func (c *Container) SetPassword(p []byte) *Container {
 	if len(p) <= blockMaxSize {
 		c.Password = p
@@ -614,6 +614,8 @@ func (c *Container) CalculateHeaders() {
 	copy(c.headers[:], header)
 }
 
+// SetRandomNonce generates a 12-byte nonce (mainly for use with AES) and stores it
+// into the Nonce field
 func (c *Container) SetRandomNonce() error {
 	nonce := make([]byte, 12)
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {

@@ -27,11 +27,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(500)
 			return
 		}
+		defer r.Body.Close()
 		fmt.Println("unmarshal ok")
 
-		fmt.Println("email", string(container.GetEmail()))
+		fmt.Println("email:", string(container.GetEmail()))
 
-		err = container.DecryptEverything(aesKey)
+		err = container.DecryptEverything(container.GetNonce(), aesKey)
 		if err != nil {
 			fmt.Println("could not decrypt:", err.Error())
 			w.WriteHeader(500)

@@ -9,7 +9,7 @@ a person, a device, an app, an endpoint or whatever it is you want to authentica
 
 There is of course some slight overhead. The data fields, like ``Certificate`` or ``Nonce`` can all
 be empty, but there is always space reserved for headers, even if no data has been set yet.
-This overhead currently amounts to __46 bytes__, plus 3 bytes for the version. If this is acceptable
+This overhead currently amounts to __50 bytes__. If this is acceptable
 for your use case, please give it a try and send feedback if it works out for you.
 
 This is **Work in Progress** which means the library is still changing but currently mostly stable
@@ -81,8 +81,10 @@ Available fields (that means data blocks) for you to use are as follows:
 * ``Signature``
 * ``RootCertificate``
 
-The fields are not exported, that means they cannot be accessed directly. Instead, there is a setter and
-a getter for each field.
+There is a setter and getter method for every field. Every time, the headers need to be recalculated.
+
+If you want to set many fields, set them all and call `container.CalculateHeaders()` manually, which would normally
+be call in every setter method.
 
 The maximum size (amount of bytes) you can put into any field is that of an unsigned 16 bit integer, that
 means **65,535** bytes. Byte slices too large will be truncated.

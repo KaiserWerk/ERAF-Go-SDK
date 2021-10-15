@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	headerSize   uint8 = 46
+	headerSize   uint8 = 50
 	blockMaxSize int   = 65535
 )
 
@@ -30,6 +30,7 @@ var (
 		0, 0, 0, 0, // private key
 		0, 0, 0, 0, // email
 		0, 0, 0, 0, // username
+		0, 0, 0, 0, // password
 		0, 0, 0, 0, // token
 		0, 0, 0, 0, // signature
 		0, 0, 0, 0, // root certificate
@@ -39,20 +40,21 @@ var (
 // Container is the central struct to work with
 type Container struct {
 	headers         [headerSize]byte
-	versionMajor    byte
-	versionMinor    byte
-	versionPatch    byte
-	nonce           []byte
-	tag             []byte
-	serialNumber    []byte
-	identifier      []byte
-	certificate     []byte
-	privateKey      []byte
-	email           []byte
-	username        []byte
-	token           []byte
-	signature       []byte
-	rootCertificate []byte
+	VersionMajor    byte
+	VersionMinor    byte
+	VersionPatch    byte
+	Nonce           []byte
+	Tag             []byte
+	SerialNumber    []byte
+	Identifier      []byte
+	Certificate     []byte
+	PrivateKey      []byte
+	Email           []byte
+	Username        []byte
+	Password        []byte
+	Token           []byte
+	Signature       []byte
+	RootCertificate []byte
 }
 
 // New creates a new *Container. Just convenience, not necessary.
@@ -64,48 +66,48 @@ func New() *Container {
 
 // GetVersionMajor returns the major version
 func (c *Container) GetVersionMajor() byte {
-	return c.versionMajor
+	return c.VersionMajor
 }
 
 // SetVersionMajor sets the major version
 func (c *Container) SetVersionMajor(v byte) *Container {
-	c.versionMajor = v
+	c.VersionMajor = v
 	return c
 }
 
 // GetVersionMinor returns the minor version
 func (c *Container) GetVersionMinor() byte {
-	return c.versionMinor
+	return c.VersionMinor
 }
 
 // SetVersionMinor sets the minor version
 func (c *Container) SetVersionMinor(v byte) *Container {
-	c.versionMinor = v
+	c.VersionMinor = v
 	return c
 }
 
 // GetVersionPatch returns the patch version
 func (c *Container) GetVersionPatch() byte {
-	return c.versionPatch
+	return c.VersionPatch
 }
 
 // SetVersionPatch sets the patch version
 func (c *Container) SetVersionPatch(v byte) *Container {
-	c.versionPatch = v
+	c.VersionPatch = v
 	return c
 }
 
 // GetNonce returns the nonce
 func (c *Container) GetNonce() []byte {
-	return c.nonce
+	return c.Nonce
 }
 
 // SetNonce sets a nonce
 func (c *Container) SetNonce(n []byte) *Container {
 	if len(n) <= blockMaxSize {
-		c.nonce = n
+		c.Nonce = n
 	} else {
-		c.nonce = n[:blockMaxSize]
+		c.Nonce = n[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -113,15 +115,15 @@ func (c *Container) SetNonce(n []byte) *Container {
 
 // GetTag returns the tag
 func (c *Container) GetTag() []byte {
-	return c.tag
+	return c.Tag
 }
 
 // SetTag sets a tag
 func (c *Container) SetTag(t []byte) *Container {
 	if len(t) <= blockMaxSize {
-		c.tag = t
+		c.Tag = t
 	} else {
-		c.tag = t[:blockMaxSize]
+		c.Tag = t[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -129,15 +131,15 @@ func (c *Container) SetTag(t []byte) *Container {
 
 // GetSerialNumber returns the serial number
 func (c *Container) GetSerialNumber() []byte {
-	return c.serialNumber
+	return c.SerialNumber
 }
 
 // SetSerialNumber sets a serial number
 func (c *Container) SetSerialNumber(sn []byte) *Container {
 	if len(sn) <= blockMaxSize {
-		c.serialNumber = sn
+		c.SerialNumber = sn
 	} else {
-		c.serialNumber = sn[:blockMaxSize]
+		c.SerialNumber = sn[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -145,15 +147,15 @@ func (c *Container) SetSerialNumber(sn []byte) *Container {
 
 // GetIdentifier returns the identifier
 func (c *Container) GetIdentifier() []byte {
-	return c.identifier
+	return c.Identifier
 }
 
 // SetIdentifier sets an identifier
 func (c *Container) SetIdentifier(id []byte) *Container {
 	if len(id) <= blockMaxSize {
-		c.identifier = id
+		c.Identifier = id
 	} else {
-		c.identifier = id[:blockMaxSize]
+		c.Identifier = id[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -161,15 +163,15 @@ func (c *Container) SetIdentifier(id []byte) *Container {
 
 // GetCertificate returns the certificate
 func (c *Container) GetCertificate() []byte {
-	return c.certificate
+	return c.Certificate
 }
 
 // SetCertificate sets a certificate. For the convenience functions to work properly, it expected to be in PEM format
 func (c *Container) SetCertificate(cert []byte) *Container {
 	if len(cert) <= blockMaxSize {
-		c.certificate = cert
+		c.Certificate = cert
 	} else {
-		c.certificate = cert[:blockMaxSize]
+		c.Certificate = cert[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -177,15 +179,15 @@ func (c *Container) SetCertificate(cert []byte) *Container {
 
 // GetPrivateKey returns the private key
 func (c *Container) GetPrivateKey() []byte {
-	return c.privateKey
+	return c.PrivateKey
 }
 
 // SetPrivateKey sets a private key. For the convenience functions to work properly, it expected to be in PEM format
 func (c *Container) SetPrivateKey(pk []byte) *Container {
 	if len(pk) <= blockMaxSize {
-		c.privateKey = pk
+		c.PrivateKey = pk
 	} else {
-		c.privateKey = pk[:blockMaxSize]
+		c.PrivateKey = pk[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -193,15 +195,15 @@ func (c *Container) SetPrivateKey(pk []byte) *Container {
 
 // GetEmail returns the email address
 func (c *Container) GetEmail() []byte {
-	return c.email
+	return c.Email
 }
 
 // SetEmail sets an email address
 func (c *Container) SetEmail(e []byte) *Container {
 	if len(e) <= blockMaxSize {
-		c.email = e
+		c.Email = e
 	} else {
-		c.email = e[:blockMaxSize]
+		c.Email = e[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -209,15 +211,31 @@ func (c *Container) SetEmail(e []byte) *Container {
 
 // GetUsername returns the username
 func (c *Container) GetUsername() []byte {
-	return c.username
+	return c.Username
 }
 
 // SetUsername sets a username
 func (c *Container) SetUsername(u []byte) *Container {
 	if len(u) <= blockMaxSize {
-		c.username = u
+		c.Username = u
 	} else {
-		c.username = u[:blockMaxSize]
+		c.Username = u[:blockMaxSize]
+	}
+	c.CalculateHeaders()
+	return c
+}
+
+// GetUsername returns the username
+func (c *Container) GetPassowrd() []byte {
+	return c.Password
+}
+
+// SetUsername sets a username
+func (c *Container) SetPassword(p []byte) *Container {
+	if len(p) <= blockMaxSize {
+		c.Password = p
+	} else {
+		c.Password = p[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -225,15 +243,15 @@ func (c *Container) SetUsername(u []byte) *Container {
 
 // GetToken returns the token
 func (c *Container) GetToken() []byte {
-	return c.token
+	return c.Token
 }
 
 // SetToken sets a token
 func (c *Container) SetToken(t []byte) *Container {
 	if len(t) <= blockMaxSize {
-		c.token = t
+		c.Token = t
 	} else {
-		c.token = t[:blockMaxSize]
+		c.Token = t[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -241,15 +259,15 @@ func (c *Container) SetToken(t []byte) *Container {
 
 // GetSignature returns the signature
 func (c *Container) GetSignature() []byte {
-	return c.signature
+	return c.Signature
 }
 
 // SetSignature sets a signature
 func (c *Container) SetSignature(sig []byte) *Container {
 	if len(sig) <= blockMaxSize {
-		c.signature = sig
+		c.Signature = sig
 	} else {
-		c.signature = sig[:blockMaxSize]
+		c.Signature = sig[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -257,15 +275,15 @@ func (c *Container) SetSignature(sig []byte) *Container {
 
 // GetRootCertificate returns the root certificate
 func (c *Container) GetRootCertificate() []byte {
-	return c.rootCertificate
+	return c.RootCertificate
 }
 
 // SetRootCertificate sets a root certificate
 func (c *Container) SetRootCertificate(rc []byte) *Container {
 	if len(rc) <= blockMaxSize {
-		c.rootCertificate = rc
+		c.RootCertificate = rc
 	} else {
-		c.rootCertificate = rc[:blockMaxSize]
+		c.RootCertificate = rc[:blockMaxSize]
 	}
 	c.CalculateHeaders()
 	return c
@@ -273,15 +291,15 @@ func (c *Container) SetRootCertificate(rc []byte) *Container {
 
 // GetSemVer returns the combination of all version elements as a semantic version string
 func (c *Container) GetSemVer() string {
-	return fmt.Sprintf("%d.%d.%d", c.versionMajor, c.versionMinor, c.versionPatch)
+	return fmt.Sprintf("%d.%d.%d", c.VersionMajor, c.VersionMinor, c.VersionPatch)
 }
 
 // GetX509Certificate returns the certificate as *x509.Certificate
 func (c *Container) GetX509Certificate() (*x509.Certificate, error) {
-	if c.certificate == nil {
+	if c.Certificate == nil {
 		return nil, fmt.Errorf("certificate is nil")
 	}
-	block, _ := pem.Decode(c.certificate)
+	block, _ := pem.Decode(c.Certificate)
 	if block == nil {
 		return nil, fmt.Errorf("PEM block is nil")
 	}
@@ -290,23 +308,23 @@ func (c *Container) GetX509Certificate() (*x509.Certificate, error) {
 
 // GetTlsCertificate returns the certificate as *tls.Certificate
 func (c *Container) GetTlsCertificate() (*tls.Certificate, error) {
-	if c.certificate == nil {
+	if c.Certificate == nil {
 		return nil, fmt.Errorf("certificate is nil")
 	}
-	if c.privateKey == nil {
+	if c.PrivateKey == nil {
 		return nil, fmt.Errorf("private key is nil")
 	}
 
-	cert, err := tls.X509KeyPair(c.certificate, c.privateKey)
+	cert, err := tls.X509KeyPair(c.Certificate, c.PrivateKey)
 	return &cert, err
 }
 
 // GetX509RootCertificate returns the root certificate as *x509.Certificate
 func (c *Container) GetX509RootCertificate() (*x509.Certificate, error) {
-	if c.rootCertificate == nil {
+	if c.RootCertificate == nil {
 		return nil, fmt.Errorf("root certificate is nil")
 	}
-	block, _ := pem.Decode(c.rootCertificate)
+	block, _ := pem.Decode(c.RootCertificate)
 	if block == nil {
 		return nil, fmt.Errorf("PEM block is nil")
 	}
@@ -325,17 +343,17 @@ func (c *Container) HeaderLen() int {
 
 // PayloadLen returns the amount of bytes the payload takes up
 func (c *Container) PayloadLen() int {
-	return 3 + len(c.nonce) + len(c.tag) + len(c.serialNumber) + len(c.identifier) + len(c.certificate) +
-		len(c.privateKey) + len(c.email) + len(c.username) + len(c.token) + len(c.signature)
+	return 3 + len(c.Nonce) + len(c.Tag) + len(c.SerialNumber) + len(c.Identifier) + len(c.Certificate) +
+		len(c.PrivateKey) + len(c.Email) + len(c.Username) + len(c.Token) + len(c.Signature)
 }
 
 // Read reads all bytes into s and returns the number of bytes read as well as an error
 func (c *Container) Read(s []byte) (int, error) {
 	n := copy(s, c.MarshalBytes())
 	if n == 0 {
-		return 0, io.EOF
+		return 0, nil
 	}
-	return n, nil
+	return n, io.EOF
 }
 
 // Headers returns just the header array of the ERAF file
@@ -345,16 +363,16 @@ func (c *Container) Headers() [headerSize]byte {
 
 // Payload returns just the payload part of the ERAF file
 func (c *Container) Payload() []byte {
-	b := append([]byte{c.versionMajor, c.versionMinor, c.versionPatch}, c.nonce...)
-	b = append(b, c.tag...)
-	b = append(b, c.serialNumber...)
-	b = append(b, c.identifier...)
-	b = append(b, c.certificate...)
-	b = append(b, c.privateKey...)
-	b = append(b, c.email...)
-	b = append(b, c.username...)
-	b = append(b, c.token...)
-	return append(b, c.signature...)
+	b := append([]byte{c.VersionMajor, c.VersionMinor, c.VersionPatch}, c.Nonce...)
+	b = append(b, c.Tag...)
+	b = append(b, c.SerialNumber...)
+	b = append(b, c.Identifier...)
+	b = append(b, c.Certificate...)
+	b = append(b, c.PrivateKey...)
+	b = append(b, c.Email...)
+	b = append(b, c.Username...)
+	b = append(b, c.Token...)
+	return append(b, c.Signature...)
 }
 
 // MarshalToFile serializes the ERAF file into the given file using the given file permissions
@@ -382,16 +400,16 @@ func (c *Container) Marshal(w io.Writer) error {
 func (c *Container) MarshalBytes() []byte {
 	c.CalculateHeaders()
 
-	payload := append([]byte{c.versionMajor, c.versionMinor, c.versionPatch}, c.nonce...)
-	payload = append(payload, c.tag...)
-	payload = append(payload, c.serialNumber...)
-	payload = append(payload, c.identifier...)
-	payload = append(payload, c.certificate...)
-	payload = append(payload, c.privateKey...)
-	payload = append(payload, c.email...)
-	payload = append(payload, c.username...)
-	payload = append(payload, c.token...)
-	payload = append(payload, c.signature...)
+	payload := append([]byte{c.VersionMajor, c.VersionMinor, c.VersionPatch}, c.Nonce...)
+	payload = append(payload, c.Tag...)
+	payload = append(payload, c.SerialNumber...)
+	payload = append(payload, c.Identifier...)
+	payload = append(payload, c.Certificate...)
+	payload = append(payload, c.PrivateKey...)
+	payload = append(payload, c.Email...)
+	payload = append(payload, c.Username...)
+	payload = append(payload, c.Token...)
+	payload = append(payload, c.Signature...)
 
 	h := c.Headers()
 	total := append(h[:], payload...)
@@ -438,75 +456,75 @@ func UnmarshalBytes(allBytes []byte, target *Container) error {
 	versionPosition := headers[0]
 	versionLength := headers[1]
 	versionBytes := payload[versionPosition : versionPosition+versionLength]
-	target.versionMajor = versionBytes[0]
-	target.versionMinor = versionBytes[1]
-	target.versionPatch = versionBytes[2]
+	target.VersionMajor = versionBytes[0]
+	target.VersionMinor = versionBytes[1]
+	target.VersionPatch = versionBytes[2]
 
 	// Nonce
 	noncePosition := binary.BigEndian.Uint16(headers[2:4])
 	nonceLength := binary.BigEndian.Uint16(headers[4:6])
 	nonceBytes := payload[noncePosition : noncePosition+nonceLength]
-	target.nonce = nonceBytes
+	target.Nonce = nonceBytes
 
 	// Tag
 	tagPosition := binary.BigEndian.Uint16(headers[6:8])
 	tagLength := binary.BigEndian.Uint16(headers[8:10])
 	tagBytes := payload[tagPosition : tagPosition+tagLength]
-	target.tag = tagBytes
+	target.Tag = tagBytes
 
 	// serial number
 	snPosition := binary.BigEndian.Uint16(headers[10:12])
 	snLength := binary.BigEndian.Uint16(headers[12:14])
 	snBytes := payload[snPosition : snPosition+snLength]
-	target.serialNumber = snBytes
+	target.SerialNumber = snBytes
 
 	// personal identifier
 	piPosition := binary.BigEndian.Uint16(headers[14:16])
 	piLength := binary.BigEndian.Uint16(headers[16:18])
 	piBytes := payload[piPosition : piPosition+piLength]
-	target.identifier = piBytes
+	target.Identifier = piBytes
 
 	// Certificate
 	certPosition := binary.BigEndian.Uint16(headers[18:20])
 	certLength := binary.BigEndian.Uint16(headers[20:22])
 	certBytes := payload[certPosition : certPosition+certLength]
-	target.certificate = certBytes
+	target.Certificate = certBytes
 
 	// private key
 	pkPosition := binary.BigEndian.Uint16(headers[22:24])
 	pkLength := binary.BigEndian.Uint16(headers[24:26])
 	pkBytes := payload[pkPosition : pkPosition+pkLength]
-	target.privateKey = pkBytes
+	target.PrivateKey = pkBytes
 
 	// email
 	emailPosition := binary.BigEndian.Uint16(headers[26:28])
 	emailLength := binary.BigEndian.Uint16(headers[28:30])
 	emailBytes := payload[emailPosition : emailPosition+emailLength]
-	target.email = emailBytes
+	target.Email = emailBytes
 
 	// username
 	usernamePosition := binary.BigEndian.Uint16(headers[30:32])
 	usernameLength := binary.BigEndian.Uint16(headers[32:34])
 	usernameBytes := payload[usernamePosition : usernamePosition+usernameLength]
-	target.username = usernameBytes
+	target.Username = usernameBytes
 
 	// token
 	tokenPosition := binary.BigEndian.Uint16(headers[34:36])
 	tokenLength := binary.BigEndian.Uint16(headers[36:38])
 	tokenBytes := payload[tokenPosition : tokenPosition+tokenLength]
-	target.token = tokenBytes
+	target.Token = tokenBytes
 
 	// signature
 	signaturePosition := binary.BigEndian.Uint16(headers[38:40])
 	signatureLength := binary.BigEndian.Uint16(headers[40:42])
 	signatureBytes := payload[signaturePosition : signaturePosition+signatureLength]
-	target.signature = signatureBytes
+	target.Signature = signatureBytes
 
 	// root certificate
 	rootCertPosition := binary.BigEndian.Uint16(headers[42:44])
 	rootCertLength := binary.BigEndian.Uint16(headers[44:])
 	rootCertBytes := payload[rootCertPosition : rootCertPosition+rootCertLength]
-	target.rootCertificate = rootCertBytes
+	target.RootCertificate = rootCertBytes
 
 	target.CalculateHeaders()
 
@@ -519,17 +537,17 @@ func (c *Container) CalculateHeaders() {
 
 	var (
 		versionLength     = uint16(3)
-		nonceLength       = uint16(len(c.nonce))
-		tagLength         = uint16(len(c.tag))
-		snLength          = uint16(len(c.serialNumber))
-		piLength          = uint16(len(c.identifier))
-		certificateLength = uint16(len(c.certificate))
-		privateKeyLength  = uint16(len(c.privateKey))
-		emailLength       = uint16(len(c.email))
-		usernameLength    = uint16(len(c.username))
-		tokenLength       = uint16(len(c.token))
-		signatureLength   = uint16(len(c.signature))
-		rootCertLength    = uint16(len(c.rootCertificate))
+		nonceLength       = uint16(len(c.Nonce))
+		tagLength         = uint16(len(c.Tag))
+		snLength          = uint16(len(c.SerialNumber))
+		piLength          = uint16(len(c.Identifier))
+		certificateLength = uint16(len(c.Certificate))
+		privateKeyLength  = uint16(len(c.PrivateKey))
+		emailLength       = uint16(len(c.Email))
+		usernameLength    = uint16(len(c.Username))
+		tokenLength       = uint16(len(c.Token))
+		signatureLength   = uint16(len(c.Signature))
+		rootCertLength    = uint16(len(c.RootCertificate))
 	)
 
 	var offset uint16 = 0
@@ -596,73 +614,77 @@ func (c *Container) CalculateHeaders() {
 	copy(c.headers[:], header)
 }
 
-// EncryptEverything take a key to encrypt every data block using AES in place. The nonce field is used to store the
-// required meta data; if already set, it will be overwritten. All blocks will be encrypted and written back, no data is
-// returned. Requires a key with a length of 16 bytes (AES-128), 24 bytes (AES-192) or 32 bytes (AES-256).
-func (c *Container) EncryptEverything(key []byte) error {
-	// create and set nonce for further use
+func (c *Container) SetRandomNonce() error {
 	nonce := make([]byte, 12)
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
 		return err
 	}
-	c.nonce = nonce
 
-	sn, err := c.EncryptSerialNumber(key)
+	c.SetNonce(nonce)
+	return nil
+}
+
+// EncryptEverything take a nonce and a key to encrypt every data block using AES in place.
+// All blocks will be encrypted and written back, no data is returned. Requires a key with a length of
+// 16 bytes (AES-128), 24 bytes (AES-192) or 32 bytes (AES-256).
+// The nonce requires a length of 12 bytes. You can use SetRandomNonce() to generate a cryptographically secure nonce.
+func (c *Container) EncryptEverything(nonce []byte, key []byte) error {
+	sn, err := c.EncryptSerialNumber(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	id, err := c.EncryptIdentifier(key)
+	id, err := c.EncryptIdentifier(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	cert, err := c.EncryptCertificate(key)
+	cert, err := c.EncryptCertificate(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	pk, err := c.EncryptPrivateKey(key)
+	pk, err := c.EncryptPrivateKey(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	email, err := c.EncryptEmail(key)
+	email, err := c.EncryptEmail(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	username, err := c.EncryptUsername(key)
+	username, err := c.EncryptUsername(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	token, err := c.EncryptToken(key)
+	token, err := c.EncryptToken(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	sig, err := c.EncryptSignature(key)
+	sig, err := c.EncryptSignature(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	rootCert, err := c.EncryptRootCertificate(key)
+	rootCert, err := c.EncryptRootCertificate(nonce, key)
 	if err != nil {
 		return err
 	}
 
 	// everything or nothing
 	// set the values only if no error occurs
-	c.serialNumber = sn
-	c.identifier = id
-	c.certificate = cert
-	c.privateKey = pk
-	c.email = email
-	c.username = username
-	c.token = token
-	c.signature = sig
-	c.rootCertificate = rootCert
+	c.SerialNumber = sn
+	c.Identifier = id
+	c.Certificate = cert
+	c.PrivateKey = pk
+	c.Email = email
+	c.Username = username
+	c.Token = token
+	c.Signature = sig
+	c.RootCertificate = rootCert
 
 	c.CalculateHeaders()
 
@@ -670,108 +692,109 @@ func (c *Container) EncryptEverything(key []byte) error {
 }
 
 // EncryptSerialNumber encrypts and returns the serial number
-func (c *Container) EncryptSerialNumber(key []byte) ([]byte, error) {
-	return encryptAes(key, c.serialNumber, c.nonce)
+func (c *Container) EncryptSerialNumber(nonce []byte, key []byte) ([]byte, error) {
+	return encryptAes(key, c.SerialNumber, nonce)
 }
 
 // EncryptIdentifier encrypts and returns the identifier
-func (c *Container) EncryptIdentifier(key []byte) ([]byte, error) {
-	return encryptAes(key, c.identifier, c.nonce)
+func (c *Container) EncryptIdentifier(nonce []byte, key []byte) ([]byte, error) {
+	return encryptAes(key, c.Identifier, nonce)
 }
 
 // EncryptCertificate encrypts and returns the certificate
-func (c *Container) EncryptCertificate(key []byte) ([]byte, error) {
-	return encryptAes(key, c.certificate, c.nonce)
+func (c *Container) EncryptCertificate(nonce []byte, key []byte) ([]byte, error) {
+	return encryptAes(key, c.Certificate, nonce)
 }
 
 // EncryptPrivateKey encrypts and returns the private key
-func (c *Container) EncryptPrivateKey(key []byte) ([]byte, error) {
-	return encryptAes(key, c.privateKey, c.nonce)
+func (c *Container) EncryptPrivateKey(nonce []byte, key []byte) ([]byte, error) {
+	return encryptAes(key, c.PrivateKey, nonce)
 }
 
 // EncryptEmail encrypts and returns the email address
-func (c *Container) EncryptEmail(key []byte) ([]byte, error) {
-	return encryptAes(key, c.email, c.nonce)
+func (c *Container) EncryptEmail(nonce []byte, key []byte) ([]byte, error) {
+	return encryptAes(key, c.Email, nonce)
 }
 
 // EncryptUsername encrypts and returns the username
-func (c *Container) EncryptUsername(key []byte) ([]byte, error) {
-	return encryptAes(key, c.username, c.nonce)
+func (c *Container) EncryptUsername(nonce []byte, key []byte) ([]byte, error) {
+	return encryptAes(key, c.Username, nonce)
 }
 
 // EncryptToken encrypts and returns the token
-func (c *Container) EncryptToken(key []byte) ([]byte, error) {
-	return encryptAes(key, c.token, c.nonce)
+func (c *Container) EncryptToken(nonce []byte, key []byte) ([]byte, error) {
+	return encryptAes(key, c.Token, nonce)
 }
 
 // EncryptSignature encrypts and returns the signature
-func (c *Container) EncryptSignature(key []byte) ([]byte, error) {
-	return encryptAes(key, c.signature, c.nonce)
+func (c *Container) EncryptSignature(nonce []byte, key []byte) ([]byte, error) {
+	return encryptAes(key, c.Signature, nonce)
 }
 
 // EncryptRootCertificate encrypts and returns the signature
-func (c *Container) EncryptRootCertificate(key []byte) ([]byte, error) {
-	return encryptAes(key, c.rootCertificate, c.nonce)
+func (c *Container) EncryptRootCertificate(nonce []byte, key []byte) ([]byte, error) {
+	return encryptAes(key, c.RootCertificate, nonce)
 }
 
 // DecryptEverything is the obvious counterpart to EncryptEverything. It performs the decryption in place, using
 // either AES-128, AES-192 or AES-256, depending on key length.
-func (c *Container) DecryptEverything(key []byte) error {
-	sn, err := c.DecryptSerialNumber(key)
+func (c *Container) DecryptEverything(nonce []byte, key []byte) error {
+	sn, err := c.DecryptSerialNumber(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	id, err := c.DecryptIdentifier(key)
+	id, err := c.DecryptIdentifier(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	cert, err := c.DecryptCertificate(key)
+	cert, err := c.DecryptCertificate(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	pk, err := c.DecryptPrivateKey(key)
+	pk, err := c.DecryptPrivateKey(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	email, err := c.DecryptEmail(key)
+	email, err := c.DecryptEmail(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	username, err := c.DecryptUsername(key)
+	username, err := c.DecryptUsername(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	token, err := c.DecryptToken(key)
+	token, err := c.DecryptToken(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	sig, err := c.DecryptSignature(key)
+	sig, err := c.DecryptSignature(nonce, key)
 	if err != nil {
 		return err
 	}
 
-	rootCert, err := c.DecryptRootCertificate(key)
+	rootCert, err := c.DecryptRootCertificate(nonce, key)
 	if err != nil {
 		return err
 	}
 
 	// everything or nothing
-	c.serialNumber = sn
-	c.identifier = id
-	c.certificate = cert
-	c.privateKey = pk
-	c.email = email
-	c.username = username
-	c.token = token
-	c.signature = sig
-	c.rootCertificate = rootCert
+	// TODO: use setters
+	c.SerialNumber = sn
+	c.Identifier = id
+	c.Certificate = cert
+	c.PrivateKey = pk
+	c.Email = email
+	c.Username = username
+	c.Token = token
+	c.Signature = sig
+	c.RootCertificate = rootCert
 
 	c.CalculateHeaders()
 
@@ -779,48 +802,48 @@ func (c *Container) DecryptEverything(key []byte) error {
 }
 
 // DecryptSerialNumber decrypts and returns the serial number
-func (c *Container) DecryptSerialNumber(key []byte) ([]byte, error) {
-	return decryptAes(key, c.serialNumber, c.nonce)
+func (c *Container) DecryptSerialNumber(nonce []byte, key []byte) ([]byte, error) {
+	return decryptAes(key, c.SerialNumber, nonce)
 }
 
 // DecryptIdentifier decrypts and returns the identifier
-func (c *Container) DecryptIdentifier(key []byte) ([]byte, error) {
-	return decryptAes(key, c.identifier, c.nonce)
+func (c *Container) DecryptIdentifier(nonce []byte, key []byte) ([]byte, error) {
+	return decryptAes(key, c.Identifier, nonce)
 }
 
 // DecryptCertificate decrypts and returns the certificate
-func (c *Container) DecryptCertificate(key []byte) ([]byte, error) {
-	return decryptAes(key, c.certificate, c.nonce)
+func (c *Container) DecryptCertificate(nonce []byte, key []byte) ([]byte, error) {
+	return decryptAes(key, c.Certificate, nonce)
 }
 
 // DecryptPrivateKey decrypts and returns the private key
-func (c *Container) DecryptPrivateKey(key []byte) ([]byte, error) {
-	return decryptAes(key, c.privateKey, c.nonce)
+func (c *Container) DecryptPrivateKey(nonce []byte, key []byte) ([]byte, error) {
+	return decryptAes(key, c.PrivateKey, nonce)
 }
 
 // DecryptEmail decrypts and returns the email address
-func (c *Container) DecryptEmail(key []byte) ([]byte, error) {
-	return decryptAes(key, c.email, c.nonce)
+func (c *Container) DecryptEmail(nonce []byte, key []byte) ([]byte, error) {
+	return decryptAes(key, c.Email, nonce)
 }
 
 // DecryptUsername decrypts and returns the username
-func (c *Container) DecryptUsername(key []byte) ([]byte, error) {
-	return decryptAes(key, c.username, c.nonce)
+func (c *Container) DecryptUsername(nonce []byte, key []byte) ([]byte, error) {
+	return decryptAes(key, c.Username, nonce)
 }
 
 // DecryptToken decrypts and returns the token
-func (c *Container) DecryptToken(key []byte) ([]byte, error) {
-	return decryptAes(key, c.token, c.nonce)
+func (c *Container) DecryptToken(nonce []byte, key []byte) ([]byte, error) {
+	return decryptAes(key, c.Token, nonce)
 }
 
 // DecryptSignature decrypts and returns the signature
-func (c *Container) DecryptSignature(key []byte) ([]byte, error) {
-	return decryptAes(key, c.signature, c.nonce)
+func (c *Container) DecryptSignature(nonce []byte, key []byte) ([]byte, error) {
+	return decryptAes(key, c.Signature, nonce)
 }
 
 // DecryptRootCertificate decrypts and returns the root certificate
-func (c *Container) DecryptRootCertificate(key []byte) ([]byte, error) {
-	return decryptAes(key, c.rootCertificate, c.nonce)
+func (c *Container) DecryptRootCertificate(nonce []byte, key []byte) ([]byte, error) {
+	return decryptAes(key, c.RootCertificate, nonce)
 }
 
 // Dump just writes all field contents into an io.Writer
@@ -841,7 +864,7 @@ func (c *Container) Dump(w io.Writer) {
 	_, _ = fmt.Fprintf(w, "Root Certificate: %s\n", c.GetRootCertificate())
 }
 
-func encryptAes(key, s, nonce []byte) ([]byte, error) {
+func encryptAes(key []byte, s []byte, nonce []byte) ([]byte, error) {
 	if len(key) != 32 && len(key) != 24 && len(key) != 16 {
 		return nil, fmt.Errorf("expected key length 32, 24 or 16, got %d", len(key))
 	}
@@ -870,9 +893,9 @@ func encryptAes(key, s, nonce []byte) ([]byte, error) {
 	return b, nil
 }
 
-func decryptAes(key, s, nonce []byte) ([]byte, error) {
+func decryptAes(key []byte, s []byte, nonce []byte) ([]byte, error) {
 	if len(key) != 32 && len(key) != 24 && len(key) != 16 {
-		return nil, fmt.Errorf("expected key length 32, 24 or 16, got %d", len(key))
+		return nil, fmt.Errorf("expected key length 32, 24 or 16 bytes, got %d", len(key))
 	}
 
 	// don't encrypt if source is empty

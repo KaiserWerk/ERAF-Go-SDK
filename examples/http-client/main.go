@@ -15,11 +15,15 @@ var (
 
 func main() {
 	container := eraf.New()
+	err := container.SetRandomNonce()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	container.SetEmail([]byte("my@cool-domain.com"))
 	container.SetUsername([]byte("cool-user"))
 
-	err := container.EncryptEverything(aesKey)
+	err = container.EncryptEverything(container.GetNonce(), aesKey)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -34,6 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	defer resp.Body.Close()
 
 	fmt.Println("Status:", resp.StatusCode)
 }

@@ -31,14 +31,14 @@ func main() {
 	fmt.Println("SerialNumber:", container.GetSerialNumber())
 	fmt.Println("Identifier:", container.GetIdentifier())
 	fmt.Println("Email:", string(container.GetEmail()))
-	email, err := container.DecryptEmail(aesKey)
+	email, err := container.DecryptEmail(container.GetNonce(), aesKey)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	fmt.Println("Email:", string(email))
 
 	fmt.Println("PI:", container.GetIdentifier())
-	pi, err := container.DecryptIdentifier(aesKey)
+	pi, err := container.DecryptIdentifier(container.GetNonce(), aesKey)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -48,7 +48,7 @@ func main() {
 	fmt.Println("Signature:", container.GetSignature())
 
 	fmt.Println("-------")
-	err = container.DecryptEverything(aesKey)
+	err = container.DecryptEverything(container.GetNonce(), aesKey)
 	if err != nil {
 		log.Fatal("Error: " + err.Error())
 	}
@@ -123,22 +123,22 @@ func createDummyEraf() {
 	token := []byte("86ws5f248a6w4342f5662w4a46264462f4w4e6")
 
 	container := eraf.New()
-	container.
-		SetVersionMajor(1).
-		SetVersionMinor(11).
-		SetVersionPatch(4).
-		SetNonce([]byte{1, 5, 14, 78, 251, 147, 95, 45, 14, 10, 64, 52}).
-		SetTag([]byte{95, 45, 14, 10, 64, 52, 1, 5, 14, 78, 251, 147, 163, 32, 57, 199}).
-		SetSerialNumber([]byte{1, 5, 199, 0, 45}).
-		SetIdentifier([]byte{1, 2, 3, 1}).
-		SetCertificate(cert).
-		SetPrivateKey(key).
-		SetEmail([]byte("email@address.com")).
-		SetUsername([]byte("my-cool-username")).
-		SetToken(token).
-		SetSignature(sig[:])
+	container.VersionMajor = 1
+	container.VersionMinor = 11
+	container.VersionPatch = 4
+	container.Nonce = []byte{1, 5, 14, 78, 251, 147, 95, 45, 14, 10, 64, 52}
+	container.Tag = []byte{95, 45, 14, 10, 64, 52, 1, 5, 14, 78, 251, 147, 163, 32, 57, 199}
+	container.SerialNumber = []byte{1, 5, 199, 0, 45}
+	container.Identifier = []byte{1, 2, 3, 1}
+	container.Certificate = cert
+	container.PrivateKey = key
+	container.Email = []byte("email@address.com")
+	container.Username = []byte("my-cool-username")
+	container.Token = token
+	container.Signature = sig[:]
+	container.CalculateHeaders()
 
-	err = container.EncryptEverything(aesKey)
+	err = container.EncryptEverything(container.GetNonce(), aesKey)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

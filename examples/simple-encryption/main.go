@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	aesKey = []byte("R081ctdcBJR3S32coUAIsVuLkjL9QyCD")
+	aesKey = []byte("R081ctdcBJR3S32coUAIsVuLkjL9QyCD") // 32 bytes
 )
 
 func main() {
@@ -17,11 +17,13 @@ func main() {
 
 	fmt.Printf("Username: %s\n", container.GetUsername())
 
-	err := container.EncryptEverything(aesKey)
+	_ = container.SetRandomNonce()
+
+	err := container.EncryptEverything(container.GetNonce(), aesKey)
 	handleError(err)
 
 	fmt.Printf("Username: %s\n", container.GetUsername())
-	err = container.DecryptEverything(aesKey)
+	err = container.DecryptEverything(container.GetNonce(), aesKey)
 	handleError(err)
 
 	fmt.Printf("Username: %s\n", container.GetUsername())

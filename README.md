@@ -81,10 +81,10 @@ Available fields (that means data blocks) for you to use are as follows:
 * ``Signature``
 * ``RootCertificate``
 
-There is a setter and getter method for every field. Every time, the headers need to be recalculated.
+There is a setter and getter method for every field. Setters can be chained. Usually the headers need to be recalculated.
 
-If you want to set many fields, set them all and call `container.CalculateHeaders()` manually, which would normally
-be call in every setter method.
+If you want to set many fields, it is more performant set them all and call `container.CalculateHeaders()` manually afterwards, which would normally
+be called in every setter method.
 
 The maximum size (amount of bytes) you can put into any field is that of an unsigned 16 bit integer, that
 means **65,535** bytes. Byte slices too large will be truncated.

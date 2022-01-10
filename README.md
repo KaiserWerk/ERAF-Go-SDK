@@ -137,7 +137,7 @@ body parameter for HTTP requests which will read the whole container into the re
 ```golang
 container := &eraf.Container{}
 // set some fields
-req, err := http.NewRequest(http.MethodPost, "https://some-url.com/", container) // currently broken
+req, err := http.NewRequest(http.MethodPost, "https://some-url.com/", container)
 ```
 
 ### Obtaining Information

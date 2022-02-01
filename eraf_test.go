@@ -593,13 +593,13 @@ func TestContainer_Len(t *testing.T) {
 		container *Container
 		want      int
 	}{
-		{name: "empty", container: New(), want: 49},
+		{name: "empty", container: New(), want: 53},
 		{name: "with username", container: func() *Container {
 			return New().SetUsername([]byte("mycoolusername"))
-		}(), want: 63},
+		}(), want: 67},
 		{name: "with username and nonce", container: func() *Container {
 			return New().SetUsername([]byte("mycoolusername")).SetNonce([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9})
-		}(), want: 72},
+		}(), want: 76},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -870,9 +870,9 @@ func TestContainer_MarshalBytes(t *testing.T) {
 		container *Container
 		wantedLen int
 	}{
-		{name: "empty", container: &Container{}, wantedLen: 49},
-		{name: "with email", container: (&Container{}).SetEmail([]byte("my-cool-email@abc.com")), wantedLen: 70},
-		{name: "with tag", container: (&Container{}).SetTag([]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), wantedLen: 59},
+		{name: "empty", container: &Container{}, wantedLen: 53},
+		{name: "with email", container: (&Container{}).SetEmail([]byte("my-cool-email@abc.com")), wantedLen: 74},
+		{name: "with tag", container: (&Container{}).SetTag([]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), wantedLen: 63},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -77,6 +77,7 @@ Available fields (that means data blocks) for you to use are as follows:
 * ``PrivateKey``
 * ``Email``
 * ``Username``
+* ``Password``
 * ``Token``
 * ``Signature``
 * ``RootCertificate``

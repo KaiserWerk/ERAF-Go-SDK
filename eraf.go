@@ -433,7 +433,12 @@ func Unmarshal(r io.Reader, target *Container) error {
 	return UnmarshalBytes(allBytes, target)
 }
 
-// UnmarshalBytes takes a []byte and a pointer to a target container and deserializes the []byte into the container
+// UnmarshalBytes takes a []byte and a pointer to a target container and deserializes the []byte into the container,
+// e.g.:
+//
+//  var b []byte // some data source
+//  var c *eraf.Container = eraf.New()
+//  err := eraf.Unmarshal(b, c)
 func UnmarshalBytes(allBytes []byte, target *Container) error {
 	if len(allBytes) < int(headerSize) {
 		return fmt.Errorf("byte slice is not large enough")
@@ -521,7 +526,8 @@ func UnmarshalBytes(allBytes []byte, target *Container) error {
 	return nil
 }
 
-// calculateHeaders sets the header bytes to correct values corresponding to field offsets and lengths
+// calculateHeaders sets the header bytes to correct values corresponding to field offsets and lengths. Will be
+// called just before the *Container is marshalled.
 func (c *Container) calculateHeaders() {
 	header := headerBlock[:]
 

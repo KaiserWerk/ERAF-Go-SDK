@@ -40,8 +40,8 @@ This is just one example of the many possible use cases.
 
 ## Installation
 
-Once the first stable version is tagged, you can download it with
-``go get -u github.com/KaiserWerk/ERAF-Go-SDK@v1.0.0`` and add the import line 
+Once a stable version is released/tagged, you can download it with
+``go get -u github.com/KaiserWerk/ERAF-Go-SDK@vX.X.X`` and add the import line 
 ``eraf "github.com/KaiserWerk/ERAF-Go-SDK`` to your Go file(s).
 
 If you want the bleeding edge version from the master branch, just drop the ``@version``.
@@ -83,10 +83,7 @@ Available fields (that means data blocks) for you to use are as follows:
 * ``Signature``
 * ``RootCertificate``
 
-There is a setter and getter method for every field. Setters can be chained. Usually the headers need to be recalculated.
-
-If you want to set many fields, it is more performant set them all and call `container.CalculateHeaders()` manually afterwards, which would normally
-be called in every setter method.
+There is a setter and getter method for every field. Setters can be chained.
 
 The maximum size (amount of bytes) you can put into any field is that of an unsigned 16 bit integer, that
 means **65,535** bytes. Byte slices too large will be truncated.

@@ -26,16 +26,16 @@ func main() {
 	fmt.Println("Header Length:", container.HeaderLen())
 	fmt.Println("Payload Length:", container.PayloadLen())
 	fmt.Println("Total Length:", container.Len())
-	fmt.Println("Nonce:", container.GetNonce())
-	fmt.Println("Tag:", container.GetTag())
-	fmt.Println("SerialNumber:", container.GetSerialNumber())
-	fmt.Println("Identifier:", container.GetIdentifier())
-	fmt.Println("Email:", string(container.GetEmail()))
+	fmt.Println("nonce:", container.GetNonce())
+	fmt.Println("tag:", container.GetTag())
+	fmt.Println("serialNumber:", container.GetSerialNumber())
+	fmt.Println("identifier:", container.GetIdentifier())
+	fmt.Println("email:", string(container.GetEmail()))
 	email, err := container.DecryptEmail(container.GetNonce(), aesKey)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	fmt.Println("Email:", string(email))
+	fmt.Println("email:", string(email))
 
 	fmt.Println("PI:", container.GetIdentifier())
 	pi, err := container.DecryptIdentifier(container.GetNonce(), aesKey)
@@ -43,9 +43,9 @@ func main() {
 		log.Fatal(err.Error())
 	}
 	fmt.Println("PI:", pi)
-	fmt.Println("Username:", string(container.GetUsername()))
-	fmt.Println("Token:", string(container.GetToken()))
-	fmt.Println("Signature:", container.GetSignature())
+	fmt.Println("username:", string(container.GetUsername()))
+	fmt.Println("token:", string(container.GetToken()))
+	fmt.Println("signature:", container.GetSignature())
 
 	fmt.Println("-------")
 	err = container.DecryptEverything(container.GetNonce(), aesKey)
@@ -57,17 +57,18 @@ func main() {
 	fmt.Println("Header Length:", container.HeaderLen())
 	fmt.Println("Payload Length:", container.PayloadLen())
 	fmt.Println("Total Length:", container.Len())
-	fmt.Println("Nonce:", container.GetNonce())
-	fmt.Println("Tag:", container.GetTag())
-	fmt.Println("SerialNumber:", container.GetSerialNumber())
-	fmt.Println("Identifier:", container.GetIdentifier())
-	fmt.Println("Email:", string(container.GetEmail()))
+	fmt.Println("nonce:", container.GetNonce())
+	fmt.Println("tag:", container.GetTag())
+	fmt.Println("serialNumber:", container.GetSerialNumber())
+	fmt.Println("identifier:", container.GetIdentifier())
+	fmt.Println("email:", string(container.GetEmail()))
 
 	err = container.MarshalToFile("test.eraf", 0700)
 	if err != nil {
 		fmt.Println("MarshalToFile error:", err.Error())
 	}
 
+	fmt.Println("\n-----------------\nSUCCESS!")
 }
 
 func createDummyEraf() {
@@ -123,20 +124,19 @@ func createDummyEraf() {
 	token := []byte("86ws5f248a6w4342f5662w4a46264462f4w4e6")
 
 	container := eraf.New()
-	container.VersionMajor = 1
-	container.VersionMinor = 11
-	container.VersionPatch = 4
-	container.Nonce = []byte{1, 5, 14, 78, 251, 147, 95, 45, 14, 10, 64, 52}
-	container.Tag = []byte{95, 45, 14, 10, 64, 52, 1, 5, 14, 78, 251, 147, 163, 32, 57, 199}
-	container.SerialNumber = []byte{1, 5, 199, 0, 45}
-	container.Identifier = []byte{1, 2, 3, 1}
-	container.Certificate = cert
-	container.PrivateKey = key
-	container.Email = []byte("email@address.com")
-	container.Username = []byte("my-cool-username")
-	container.Token = token
-	container.Signature = sig[:]
-	container.CalculateHeaders()
+	container.SetVersionMajor(1)
+	container.SetVersionMinor(11)
+	container.SetVersionPatch(4)
+	container.SetNonce([]byte{1, 5, 14, 78, 251, 147, 95, 45, 14, 10, 64, 52})
+	container.SetTag([]byte{95, 45, 14, 10, 64, 52, 1, 5, 14, 78, 251, 147, 163, 32, 57, 199})
+	container.SetSerialNumber([]byte{1, 5, 199, 0, 45})
+	container.SetIdentifier([]byte{1, 2, 3, 1})
+	container.SetCertificate(cert)
+	container.SetPrivateKey(key)
+	container.SetEmail([]byte("email@address.com"))
+	container.SetUsername([]byte("my-cool-username"))
+	container.SetToken(token)
+	container.SetSignature(sig[:])
 
 	err = container.EncryptEverything(container.GetNonce(), aesKey)
 	if err != nil {

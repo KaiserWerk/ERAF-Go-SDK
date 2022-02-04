@@ -1,4 +1,4 @@
-package era
+package eraf
 
 import (
 	"bytes"
@@ -314,7 +314,7 @@ func TestContainer_GetEmail(t *testing.T) {
 
 func TestContainer_SetUsername(t *testing.T) {
 	var (
-		expected = []byte("My Super cool Username")
+		expected = []byte("My Super cool username")
 		c        = New().SetUsername(expected)
 	)
 
@@ -325,7 +325,7 @@ func TestContainer_SetUsername(t *testing.T) {
 
 func TestContainer_GetUsername(t *testing.T) {
 	var (
-		expected = []byte("My Super cool Username")
+		expected = []byte("My Super cool username")
 		c        = New().SetUsername(expected)
 	)
 
@@ -497,7 +497,7 @@ UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
 
 	_, err := c.GetX509Certificate()
 	if err != nil {
-		t.Errorf("expected certificate as x509.Certificate, got error '%s'", err.Error())
+		t.Errorf("expected certificate as x509.certificate, got error '%s'", err.Error())
 	}
 }
 
@@ -554,7 +554,7 @@ vWlq4ZcJ6P2cq+IOGifZd5mYTSjGey7T6WFapo7bl7mnuwoDP4S40A==
 
 	_, err := c.GetTlsCertificate()
 	if err != nil {
-		t.Errorf("expected tls.Certificate, got error '%s'", err.Error())
+		t.Errorf("expected tls.certificate, got error '%s'", err.Error())
 	}
 }
 
@@ -583,7 +583,7 @@ UiBKSNCwyEQDUZxL1ifPJnAoOXyCl/gl/FzRzmtKPfP2qeRey9jU
 
 	_, err := c.GetX509RootCertificate()
 	if err != nil {
-		t.Errorf("expected root certificate as x509.Certificate, got error '%s'", err.Error())
+		t.Errorf("expected root certificate as x509.certificate, got error '%s'", err.Error())
 	}
 }
 
@@ -782,11 +782,30 @@ func TestContainer_Marshal(t *testing.T) {
 	}
 }
 
+func TestContainer_MarshalBytes(t *testing.T) {
+	tests := []struct {
+		name      string
+		container *Container
+		wantedLen int
+	}{
+		{name: "empty", container: &Container{}, wantedLen: 53},
+		{name: "with email", container: (&Container{}).SetEmail([]byte("my-cool-email@abc.com")), wantedLen: 74},
+		{name: "with tag", container: (&Container{}).SetTag([]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), wantedLen: 63},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.container.MarshalBytes(); len(got) != tt.wantedLen {
+				t.Errorf("MarshalBytes() = %d, want %d", len(got), tt.wantedLen)
+			}
+		})
+	}
+}
+
 /**
 Benchmark tests
 */
 
-func BenchmarkUnmarshalFromFile(b *testing.B) {
+func Benchmark_UnmarshalFromFile(b *testing.B) {
 	const filename = "__bench_unmarshal_from_file.eraf"
 	var (
 		start     = New()
@@ -810,7 +829,7 @@ func BenchmarkUnmarshalFromFile(b *testing.B) {
 	}
 }
 
-func BenchmarkUnmarshalBytes(b *testing.B) {
+func Benchmark_UnmarshalBytes(b *testing.B) {
 	var (
 		container = New()
 		s         = New().MarshalBytes()
@@ -825,7 +844,7 @@ func BenchmarkUnmarshalBytes(b *testing.B) {
 	}
 }
 
-func BenchmarkMarshal(b *testing.B) {
+func Benchmark_Marshal(b *testing.B) {
 	var (
 		container = New()
 		err       error
@@ -833,12 +852,12 @@ func BenchmarkMarshal(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		err = container.Marshal(io.Discard)
 		if err != nil {
-			b.Error(err.Error())
+			b.Fatal(err.Error())
 		}
 	}
 }
 
-func BenchmarkMarshalToFile(b *testing.B) {
+func Benchmark_MarshalToFile(b *testing.B) {
 	const filename = "__bench_marshal_to_file.eraf"
 	var (
 		container = New()
@@ -861,24 +880,5 @@ func BenchmarkMarshalToFile(b *testing.B) {
 		if err != nil {
 			b.Errorf(err.Error())
 		}
-	}
-}
-
-func TestContainer_MarshalBytes(t *testing.T) {
-	tests := []struct {
-		name      string
-		container *Container
-		wantedLen int
-	}{
-		{name: "empty", container: &Container{}, wantedLen: 53},
-		{name: "with email", container: (&Container{}).SetEmail([]byte("my-cool-email@abc.com")), wantedLen: 74},
-		{name: "with tag", container: (&Container{}).SetTag([]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), wantedLen: 63},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.container.MarshalBytes(); len(got) != tt.wantedLen {
-				t.Errorf("MarshalBytes() = %d, want %d", len(got), tt.wantedLen)
-			}
-		})
 	}
 }

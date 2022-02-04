@@ -1,4 +1,4 @@
-package era
+package eraf
 
 import (
 	"crypto/aes"

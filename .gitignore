@@ -3,5 +3,6 @@
 testdata/
 
 *.out
+*.exe
 *.eraf
 *.eraf.gz

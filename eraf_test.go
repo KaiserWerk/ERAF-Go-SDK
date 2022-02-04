@@ -844,17 +844,20 @@ func Benchmark_UnmarshalBytes(b *testing.B) {
 	}
 }
 
-func Benchmark_Marshal(b *testing.B) {
+func Benchmark_Unmarshal(b *testing.B) {
 	var (
-		container = New()
-		err       error
+		err error
+		c   = New().SetEmail([]byte("some@email.com")).SetUsername([]byte("my cool username"))
+		c2  = New()
 	)
+	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		err = container.Marshal(io.Discard)
-		if err != nil {
-			b.Fatal(err.Error())
+		if err = Unmarshal(c, c2); err != nil {
+			b.Fatalf("could not Unmarshal from buffer: %s", err.Error())
 		}
 	}
+
 }
 
 func Benchmark_MarshalToFile(b *testing.B) {
@@ -879,6 +882,28 @@ func Benchmark_MarshalToFile(b *testing.B) {
 		err = container.Marshal(fh)
 		if err != nil {
 			b.Errorf(err.Error())
+		}
+	}
+}
+
+func Benchmark_MarshalBytes(b *testing.B) {
+	c := New().SetEmail([]byte("my@nice-domain.local")).SetIdentifier([]byte{1, 2, 3, 4, 5, 6, 7, 78, 8, 9, 9})
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_ = c.MarshalBytes()
+	}
+}
+
+func Benchmark_Marshal(b *testing.B) {
+	var (
+		container = New()
+		err       error
+	)
+	for i := 0; i < b.N; i++ {
+		err = container.Marshal(io.Discard)
+		if err != nil {
+			b.Fatal(err.Error())
 		}
 	}
 }

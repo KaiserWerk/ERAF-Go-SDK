@@ -13,8 +13,7 @@ be empty, but there is always space reserved for headers, even if no data has be
 This overhead currently amounts to __50 bytes__. If this is acceptable
 for your use case, please give it a try and send feedback if it works out for you.
 
-This is **Work in Progress** which means the library is still changing but currently mostly stable
-and version 1 will arrive soon.
+This library is now considered stable.
 
 ## Due tests
 
@@ -40,8 +39,7 @@ This is just one example of the many possible use cases.
 
 ## Installation
 
-Once a stable version is released/tagged, you can download it with
-``go get -u github.com/KaiserWerk/ERAF-Go-SDK@vX.X.X`` and add the import line 
+Install via ``go get github.com/KaiserWerk/ERAF-Go-SDK@vX.X.X`` and add the import line 
 ``eraf "github.com/KaiserWerk/ERAF-Go-SDK`` to your Go file(s).
 
 If you want the bleeding edge version from the master branch, just drop the ``@version``.
